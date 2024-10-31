@@ -1,0 +1,8 @@
+<yandex>
+    <kafka>
+        <broker>
+            <host>kafka</host>
+            <port>9092</port>
+        </broker>
+    </kafka>
+</yandex>

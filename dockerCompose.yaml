@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./clickhouse-config:/etc/clickhouse-server/config.d
+      - ./clickhouse-init:/docker-entrypoint-initdb.d
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: clickhouse
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # nifi:
+  #   image: apache/nifi:latest
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     NIFI_WEB_HTTP_PORT: 8080
+  #     SINGLE_USER_CREDENTIALS_USERNAME: admin
+  #     SINGLE_USER_CREDENTIALS_PASSWORD: ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+  #   volumes:
+  #     - nifi-data:/opt/nifi/nifi-current/data
+  #     - nifi-flowfile:/opt/nifi/nifi-current/flowfile_repository
+  #     - nifi-content:/opt/nifi/nifi-current/content_repository
+  #     - nifi-database:/opt/nifi/nifi-current/database_repository
+  #     - nifi-provenance:/opt/nifi/nifi-current/provenance_repository
+  #     - ./nifi-conf/flow.xml.gz:/opt/nifi/nifi-current/conf/flow.xml.gz
+  #   healthcheck:
+  #     test: "${DOCKER_HEALTHCHECK_TEST:-curl -f http://localhost:8080/nifi/}"
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   depends_on:
+  #     - kafka
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "marketwatch_headlines:1:1"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: grafana
+      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - clickhouse
+
+volumes:
+  clickhouse-data:
+  grafana-data:
+  nifi-data:
+  nifi-flowfile:
+  nifi-content:
+  nifi-database:
+  nifi-provenance:
