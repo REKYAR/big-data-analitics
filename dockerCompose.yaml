@@ -1,83 +1,168 @@
 version: '3.8'
 
+# include:
+#   - dockerComposeTemporal.yaml
+
 services:
-  clickhouse:
-    image: clickhouse/clickhouse-server:latest
-    ports:
-      - "8123:8123"
-      - "9000:9000"
+  # clickhouse:
+  #   image: clickhouse/clickhouse-server:latest
+  #   ports:
+  #     - "8123:8123"
+  #     - "9000:9000"
+  #   volumes:
+  #     - clickhouse-data:/var/lib/clickhouse
+  #     - ./clickhouse-config:/etc/clickhouse-server/config.d
+  #     - ./clickhouse-init:/docker-entrypoint-initdb.d
+  #   environment:
+  #     CLICKHOUSE_DB: default
+  #     CLICKHOUSE_USER: default
+  #     CLICKHOUSE_PASSWORD: clickhouse
+  #   healthcheck:
+  #     test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+  # # nifi:
+  # #   image: apache/nifi:latest
+  # #   container_name: nifi
+  # #   ports:
+  # #     - "8443:8443"
+  # #   environment:
+  # #     - SINGLE_USER_CREDENTIALS_USERNAME=admin
+  # #     - SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
+  # #     - FREECURRENCY_API_KEY=ca_live_SW9uPOSldPscO3JSpmvcZ7lz2sDTyoTaopfSAL8N
+  # #   deploy:
+  # #     replicas: 1
+  # #   volumes:
+  # #     - ./local/conf:/opt/nifi/current/conf
+  # #     - ./local/content:/opt/nifi/current/content_repository
+  # #     - ./local/db:/opt/nifi/current/database_repository
+  # #     - ./local/flowfile:/opt/nifi/current/flowfile_repository
+  # #     - ./local/provenance:/opt/nifi/current/provenance_repository
+  # #     - ./local/logs:/opt/nifi/current/logs
+  # #     - ./local/data:/opt/nifi/current/data
+
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:latest
+  #   environment:
+  #     ZOOKEEPER_CLIENT_PORT: 2181
+  #     ZOOKEEPER_TICK_TIME: 2000
+  #   ports:
+  #     - "2181:2181"
+
+  # kafka:
+  #   image: wurstmeister/kafka:latest
+  #   depends_on:
+  #     - zookeeper
+  #   ports:
+  #     - "9092:9092"
+  #     - "29092:29092"
+  #   environment:
+  #     KAFKA_BROKER_ID: 1
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+  #     KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_CREATE_TOPICS: "marketwatch_bronze:1:1,marketwatch_silver:1:1,freecurrencyapi_bronze:1:1,freecurrencyapi_silver:1:1,investingcom_bitcoin_bronze:1:1,investingcom_tsla_bronze:1:1,investingcom_amzn_bronze:1:1,investingcom_silver:1:1,kaggle_gold_bronze:1:1,kaggle_gold_silver:1:1"
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   ports:
+  #     - "3003:3003"
+  #   environment:
+  #     GF_SECURITY_ADMIN_USER: admin
+  #     GF_SECURITY_ADMIN_PASSWORD: grafana
+  #     GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+  #   volumes:
+  #     - grafana-data:/var/lib/grafana
+  #     - ./grafana/provisioning:/etc/grafana/provisioning
+  #   depends_on:
+  #     - clickhouse
+
+  elasticsearch:
+    container_name: temporal-elasticsearch
+    environment:
+      - cluster.routing.allocation.disk.threshold_enabled=true
+      - cluster.routing.allocation.disk.watermark.low=512mb
+      - cluster.routing.allocation.disk.watermark.high=256mb
+      - cluster.routing.allocation.disk.watermark.flood_stage=128mb
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms256m -Xmx256m
+      - xpack.security.enabled=false
+    image: elasticsearch:${ELASTICSEARCH_VERSION}
+    # networks:
+    #   - temporal-network
+    expose:
+      - 9200
     volumes:
-      - clickhouse-data:/var/lib/clickhouse
-      - ./clickhouse-config:/etc/clickhouse-server/config.d
-      - ./clickhouse-init:/docker-entrypoint-initdb.d
-    environment:
-      CLICKHOUSE_DB: default
-      CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: clickhouse
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - /var/lib/elasticsearch/data
 
-  nifi:
-    image: apache/nifi:latest
-    container_name: nifi
-    ports:
-      - "8443:8443"
+  postgresql:
+    container_name: temporal-postgresql
     environment:
-      - SINGLE_USER_CREDENTIALS_USERNAME=admin
-      - SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
-      - FREECURRENCY_API_KEY=ca_live_SW9uPOSldPscO3JSpmvcZ7lz2sDTyoTaopfSAL8N
-    deploy:
-      replicas: 1
+      POSTGRES_PASSWORD: temporal
+      POSTGRES_USER: temporal
+    image: postgres:${POSTGRESQL_VERSION}
+    # networks:
+    #   - temporal-network
+    expose:
+      - 5432
     volumes:
-      - ./local/conf:/opt/nifi/current/conf
-      - ./local/content:/opt/nifi/current/content_repository
-      - ./local/db:/opt/nifi/current/database_repository
-      - ./local/flowfile:/opt/nifi/current/flowfile_repository
-      - ./local/provenance:/opt/nifi/current/provenance_repository
-      - ./local/logs:/opt/nifi/current/logs
-      - ./local/data:/opt/nifi/current/data
+      - /var/lib/postgresql/data
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
-
-  kafka:
-    image: wurstmeister/kafka:latest
+  temporal:
+    container_name: temporal
     depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "29092:29092"
+      - postgresql
+      - elasticsearch
+      #- kafka
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "marketwatch_bronze:1:1,marketwatch_silver:1:1,freecurrencyapi_bronze:1:1,freecurrencyapi_silver:1:1,investingcom_bitcoin_bronze:1:1,investingcom_tsla_bronze:1:1,investingcom_amzn_bronze:1:1,investingcom_silver:1:1,kaggle_gold_bronze:1:1,kaggle_gold_silver:1:1"
-
-  grafana:
-    image: grafana/grafana:latest
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgresql
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - ENABLE_ES=true
+      - ES_SEEDS=elasticsearch
+      - ES_VERSION=v7
+    image: temporalio/auto-setup:${TEMPORAL_VERSION}
+    # networks:
+    #   - temporal-network
     ports:
-      - "3000:3000"
-    environment:
-      GF_SECURITY_ADMIN_USER: admin
-      GF_SECURITY_ADMIN_PASSWORD: grafana
-      GF_INSTALL_PLUGINS: grafana-clickhouse-datasource
+      - 7233:7233
     volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+
+  temporal-admin-tools:
+    container_name: temporal-admin-tools
     depends_on:
-      - clickhouse
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    image: temporalio/admin-tools:${TEMPORAL_ADMINTOOLS_VERSION}
+    # networks:
+    #   - temporal-network
+    stdin_open: true
+    tty: true
+
+  temporal-ui:
+    container_name: temporal-ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    image: temporalio/ui:${TEMPORAL_UI_VERSION}
+    # networks:
+    #   - temporal-network
+    ports:
+      - 8080:8080
+
 
 volumes:
   clickhouse-data:
