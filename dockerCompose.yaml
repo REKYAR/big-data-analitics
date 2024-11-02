@@ -28,7 +28,9 @@ services:
     environment:
       - SINGLE_USER_CREDENTIALS_USERNAME=admin
       - SINGLE_USER_CREDENTIALS_PASSWORD=ctsBtRBKHRAx69EqUghvvgEvjnaLjFEB
-      - FREECURRENCY_API_KEY=ca_live_SW9uPOSldPscO3JSpmvcZ7lz2sDTyoTaopfSAL8N
+    env_file:
+      - path: secrets.env
+        required: true
     deploy:
       replicas: 1
     volumes:
@@ -39,6 +41,7 @@ services:
       - ./local/provenance:/opt/nifi/current/provenance_repository
       - ./local/logs:/opt/nifi/current/logs
       - ./local/data:/opt/nifi/current/data
+      - ./local/BIG_DATA:/home/nifi/data
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
