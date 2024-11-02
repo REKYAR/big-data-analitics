@@ -1,0 +1,5 @@
+# large input files
+local/BIG_DATA
+
+# secrets
+secrets.env
