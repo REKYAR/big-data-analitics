@@ -64,10 +64,9 @@ it is key for consumers to handle duplicate IDs across separate messages.
 
 ### investing.com data
 
-**Bronze topics:**
-- `investingcom_bitcoin_bronze`
-- `investingcom_tsla_bronze`
-- `investingcom_amzn_bronze`
+**Bronze topics:**`investingcom_{entity}_bronze`
+
+Entity is for example 'bitcoin', or 'amzn'. It is obtained by splitting a filename by spaces, taking the first element, and converting to lowercase.
 
 **Silver topic:** `investingcom_silver`
 
