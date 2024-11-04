@@ -5,8 +5,7 @@ This file summarises the most important information related to them.
 
 ## Secrets
 
-The following environment variables need to be set up:
-- `ALPACA_API_KEY`
+The following environment variables need to be set up in the `./secrets.env` file:
 - `FREECURRENCY_API_KEY`
 
 ## Input data
@@ -27,7 +26,8 @@ Steps 1-4 are needed to be performed only when running the flow for the first ti
 4. Make sure that all controllers are running:
    - In the "Operate" panel, click on the settings icon. A window will show up;
    - In the top bar, navigate to "Controller services";
-   - For each, press the lightning icon on the right-hand side to start it (if it is running, the icon will show a crossed-out lightning and there will be no delete icon);
+   - Make sure that the "XMLRecordSetWriter" controller has "Name of Record Tag" property set to rss. If not, set it;
+   - For each controller, press the lightning icon on the right-hand side to start it (if it is running, the icon will show a crossed-out lightning and there will be no delete icon);
    - Once all controllers are running you can close the settings window;
 5. At this point there should be no more warnings (triangular exclamation mark icons on the processors); If there are any then abort and consult it with the team;
 6. Place the necessary input files in their specified directories (see "Input data" section above);
@@ -43,7 +43,13 @@ Steps 1-4 are needed to be performed only when running the flow for the first ti
 ## Kafka topics
 
 Broker is expected to be on `kafka:9092`.
-For bronze topics, data is published in the original format (except for MarketWatch which is converted to JSON to avoid schema errors). For silver topics, it is always converted to CSV.
+For bronze topics, data is published in the original format. For silver topics, it is always converted to CSV.
+
+### Alpaca Markets data
+
+**Bronze topic:** `alpaca_bronze`
+
+**Silver topic:** `alpaca_silver`
 
 ### MarketWatch data
 
