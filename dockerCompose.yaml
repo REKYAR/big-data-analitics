@@ -20,6 +20,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+    depends_on:
+      - kafka
 
   nifi:
     image: apache/nifi:latest
@@ -43,6 +45,8 @@ services:
       - ./local/logs:/opt/nifi/current/logs
       - ./local/data:/opt/nifi/current/data
       - ./local/BIG_DATA:/home/nifi/data
+    depends_on:
+      - kafka
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

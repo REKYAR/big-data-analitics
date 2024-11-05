@@ -1,25 +1,41 @@
-CREATE TABLE IF NOT EXISTS marketwatch_headlines
-(
-    timestamp DateTime,
-    headline String,
-    author String,
-    guid String
-)
-ENGINE = MergeTree()
-ORDER BY timestamp;
+CREATE DATABASE IF NOT EXISTS BigDataAnalytics;
+USE BigDataAnalytics;
 
-CREATE TABLE IF NOT EXISTS kafka_marketwatch_feed
-(
-    timestamp DateTime,
-    headline String,
-    author String,
-    guid String
-)
-ENGINE = Kafka
-SETTINGS kafka_broker_list = 'kafka:9092',
-         kafka_topic_list = 'marketwatch_headlines',
-         kafka_group_name = 'clickhouse_marketwatch_group',
-         kafka_format = 'JSONEachRow';
+drop VIEW if exists feed_consumeer_marketwatch_silver;
+drop TABLE if exists marketwatch_silver_raw_data;
+drop TABLE if exists marketwatch_silver_consumable;
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS kafka_marketwatch_consumer TO marketwatch_headlines
-AS SELECT * FROM kafka_marketwatch_feed;
+-- marketwatch sivler
+CREATE TABLE IF NOT EXISTS marketwatch_silver_raw_data (
+    id String,
+    feedTitle String,
+    title String,
+    description String,
+    date String
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',            -- replace with your Kafka broker list
+    kafka_topic_list = 'marketwatch_silver',           -- replace with your topic
+    kafka_group_name = 'marketwatch_clickhouse_group',
+    kafka_format = 'CSV',
+    kafka_row_delimiter = '\n',
+    kafka_num_consumers = 1;
+
+CREATE TABLE IF NOT EXISTS marketwatch_silver_consumable (
+    id String,
+    feedTitle String,
+    title String,
+    description String,
+    date DateTime('UTC')  -- Assuming the incoming date is UTC
+) ENGINE = MergeTree()
+ORDER BY id;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumeer_marketwatch_silver TO marketwatch_silver_consumable
+AS
+SELECT
+    id,
+    feedTitle,
+    title,
+    description,
+    parseDateTimeBestEffort(date) AS date
+FROM marketwatch_silver_raw_data;

@@ -1,8 +1,5 @@
-<yandex>
+<clickhouse>
     <kafka>
-        <broker>
-            <host>kafka</host>
-            <port>9092</port>
-        </broker>
+        <debug>all</debug>
     </kafka>
-</yandex>
+</clickhouse>
