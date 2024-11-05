@@ -71,7 +71,7 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "marketwatch_bronze:1:1,marketwatch_silver:1:1,freecurrencyapi_bronze:1:1,freecurrencyapi_silver:1:1,investingcom_bitcoin_bronze:1:1,investingcom_tsla_bronze:1:1,investingcom_amzn_bronze:1:1,investingcom_silver:1:1,kaggle_gold_bronze:1:1,kaggle_gold_silver:1:1"
+      KAFKA_CREATE_TOPICS: "marketwatch_bronze:1:1,marketwatch_silver:1:1,freecurrencyapi_bronze:1:1,freecurrencyapi_silver:1:1,investingcom_bitcoin_bronze:1:1,investingcom_tsla_bronze:1:1,investingcom_amzn_bronze:1:1,investingcom_silver:1:1,kaggle_gold_bronze:1:1,kaggle_gold_silver:1:1,alpaca_bronze:1:1,alpaca_silver:1:1"
 
   grafana:
     image: grafana/grafana:latest

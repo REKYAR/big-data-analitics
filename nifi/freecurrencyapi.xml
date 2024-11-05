@@ -5,6 +5,58 @@
     <name>freecurrencyapi</name>
     <snippet>
         <connections>
+            <id>0f2b5ac4-4fe0-3d05-0000-000000000000</id>
+            <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
+            <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+            <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+            <destination>
+                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
+                <id>f5706f36-e132-32b8-0000-000000000000</id>
+                <type>PROCESSOR</type>
+            </destination>
+            <flowFileExpiration>0 sec</flowFileExpiration>
+            <labelIndex>1</labelIndex>
+            <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+            <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+            <name></name>
+            <selectedRelationships>matched</selectedRelationships>
+            <source>
+                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
+                <id>16be90d1-9204-3099-0000-000000000000</id>
+                <type>PROCESSOR</type>
+                <versionedComponentId>16be90d1-9204-3099-821c-9b593e33d29a</versionedComponentId>
+            </source>
+            <zIndex>0</zIndex>
+        </connections>
+        <connections>
+            <id>3940c9db-c4ba-384c-0000-000000000000</id>
+            <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
+            <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+            <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+            <destination>
+                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
+                <id>fdb89c29-1635-35e3-0000-000000000000</id>
+                <type>PROCESSOR</type>
+                <versionedComponentId>fdb89c29-1635-35e3-9f8f-f7de472925ba</versionedComponentId>
+            </destination>
+            <flowFileExpiration>0 sec</flowFileExpiration>
+            <labelIndex>1</labelIndex>
+            <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+            <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+            <name></name>
+            <selectedRelationships>success</selectedRelationships>
+            <source>
+                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
+                <id>f5706f36-e132-32b8-0000-000000000000</id>
+                <type>PROCESSOR</type>
+            </source>
+            <zIndex>0</zIndex>
+        </connections>
+        <connections>
             <id>ab12711c-c8e0-325e-0000-000000000000</id>
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
             <versionedComponentId>ab12711c-c8e0-325e-b531-ff92a7ee8302</versionedComponentId>
@@ -29,34 +81,6 @@
                 <id>a51f7d05-bcfb-3fc6-0000-000000000000</id>
                 <type>PROCESSOR</type>
                 <versionedComponentId>a51f7d05-bcfb-3fc6-a26b-fb29775a701e</versionedComponentId>
-            </source>
-            <zIndex>0</zIndex>
-        </connections>
-        <connections>
-            <id>c831dad2-7651-3650-0000-000000000000</id>
-            <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
-            <versionedComponentId>c831dad2-7651-3650-a831-94a86d3ec05f</versionedComponentId>
-            <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
-            <backPressureObjectThreshold>10000</backPressureObjectThreshold>
-            <destination>
-                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
-                <id>fdb89c29-1635-35e3-0000-000000000000</id>
-                <type>PROCESSOR</type>
-                <versionedComponentId>fdb89c29-1635-35e3-9f8f-f7de472925ba</versionedComponentId>
-            </destination>
-            <flowFileExpiration>0 sec</flowFileExpiration>
-            <labelIndex>1</labelIndex>
-            <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
-            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
-            <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
-            <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
-            <name></name>
-            <selectedRelationships>matched</selectedRelationships>
-            <source>
-                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
-                <id>16be90d1-9204-3099-0000-000000000000</id>
-                <type>PROCESSOR</type>
-                <versionedComponentId>16be90d1-9204-3099-821c-9b593e33d29a</versionedComponentId>
             </source>
             <zIndex>0</zIndex>
         </connections>
@@ -1885,11 +1909,142 @@
             <type>org.apache.nifi.processors.standard.InvokeHTTP</type>
         </processors>
         <processors>
+            <id>f5706f36-e132-32b8-0000-000000000000</id>
+            <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
+            <position>
+                <x>168.0</x>
+                <y>648.0</y>
+            </position>
+            <bundle>
+                <artifact>nifi-standard-nar</artifact>
+                <group>org.apache.nifi</group>
+                <version>1.28.0</version>
+            </bundle>
+            <config>
+                <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                <bulletinLevel>WARN</bulletinLevel>
+                <comments></comments>
+                <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                <descriptors>
+                    <entry>
+                        <key>jolt-transform</key>
+                        <value>
+                            <name>jolt-transform</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>jolt-custom-class</key>
+                        <value>
+                            <dependencies>
+<dependentValues>jolt-transform-custom</dependentValues>
+<propertyName>jolt-transform</propertyName>
+                            </dependencies>
+                            <name>jolt-custom-class</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>jolt-custom-modules</key>
+                        <value>
+                            <dependencies>
+<dependentValues>jolt-transform-custom</dependentValues>
+<propertyName>jolt-transform</propertyName>
+                            </dependencies>
+                            <name>jolt-custom-modules</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>jolt-spec</key>
+                        <value>
+                            <name>jolt-spec</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>Transform Cache Size</key>
+                        <value>
+                            <name>Transform Cache Size</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>pretty_print</key>
+                        <value>
+                            <name>pretty_print</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>Max String Length</key>
+                        <value>
+                            <name>Max String Length</name>
+                        </value>
+                    </entry>
+                </descriptors>
+                <executionNode>ALL</executionNode>
+                <lossTolerant>false</lossTolerant>
+                <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                <penaltyDuration>30 sec</penaltyDuration>
+                <properties>
+                    <entry>
+                        <key>jolt-transform</key>
+                        <value>jolt-transform-chain</value>
+                    </entry>
+                    <entry>
+                        <key>jolt-custom-class</key>
+                    </entry>
+                    <entry>
+                        <key>jolt-custom-modules</key>
+                    </entry>
+                    <entry>
+                        <key>jolt-spec</key>
+                        <value>[
+  {
+    "operation": "default",
+    "spec": {
+      "timestamp": "${now():toNumber():format('yyyy-MM-dd')}"
+    }
+  }
+]
+</value>
+                    </entry>
+                    <entry>
+                        <key>Transform Cache Size</key>
+                        <value>1</value>
+                    </entry>
+                    <entry>
+                        <key>pretty_print</key>
+                        <value>false</value>
+                    </entry>
+                    <entry>
+                        <key>Max String Length</key>
+                        <value>20 MB</value>
+                    </entry>
+                </properties>
+                <retryCount>10</retryCount>
+                <runDurationMillis>0</runDurationMillis>
+                <schedulingPeriod>0 sec</schedulingPeriod>
+                <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                <yieldDuration>1 sec</yieldDuration>
+            </config>
+            <executionNodeRestricted>false</executionNodeRestricted>
+            <name>JoltTransformJSON</name>
+            <relationships>
+                <autoTerminate>true</autoTerminate>
+                <name>failure</name>
+                <retry>false</retry>
+            </relationships>
+            <relationships>
+                <autoTerminate>false</autoTerminate>
+                <name>success</name>
+                <retry>false</retry>
+            </relationships>
+            <state>STOPPED</state>
+            <style/>
+            <type>org.apache.nifi.processors.standard.JoltTransformJSON</type>
+        </processors>
+        <processors>
             <id>fdb89c29-1635-35e3-0000-000000000000</id>
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
             <position>
                 <x>168.0</x>
-                <y>640.0</y>
+                <y>856.0</y>
             </position>
             <versionedComponentId>fdb89c29-1635-35e3-9f8f-f7de472925ba</versionedComponentId>
             <bundle>
@@ -2291,5 +2446,5 @@
             <type>org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_2_6</type>
         </processors>
     </snippet>
-    <timestamp>11/02/2024 12:24:52 UTC</timestamp>
+    <timestamp>11/05/2024 00:27:23 UTC</timestamp>
 </template>
