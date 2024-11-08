@@ -3,8 +3,16 @@
 Course project at Warsaw Univeristy of Technology
 
 
-# clickhouse troubleshooting
-what we want to do https://clickhouse.com/docs/en/integrations/kafka/kafka-table-engine
-run pipeline
-go to clickhouse container cat the error log file and inspect - I noticed the issue with connection to kafka
-somethin may be wrong with the init script and you need to manuall remove container data (trashcan button in docker desktop ui) in order to reload new config
+# Development docs
+
+## Setup
+
+## Nifi
+- [Docs are here](nifi/README.md) 
+
+## Kafka
+- When running if you want to read a message in terminal go to Exec tab in docker compose and execute ``` opt/kafka/bin/kafka-console-consumer.sh --topic $TOPIC_NAME --bootstrap-server kafka:9092 ```
+
+## Clickhouse
+- To run queries go to Exec tab in docker compose and execute ``` cickhouse-client ``` command, clichkouse terminal shall appear
+- Execute ```USE BigDataAnalytics; SHOW TABLES;``` to see available tables in our project, note that the tables that directly ingest kafka are locked from reading, refer to their *_consumalbe version
