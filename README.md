@@ -6,6 +6,9 @@ Course project at Warsaw Univeristy of Technology
 # Development docs
 
 ## Setup
+- download stuff to run docker with (most likely wsl2)
+- download docker compose
+- run pipeline by configuring Nifi (below) and then calling ```docker-compose -f dockerCompose.yaml up```, to terminate ```docker-compose -f dockerCompose.yaml down ```
 
 ## Nifi
 - [Docs are here](nifi/README.md) 
@@ -16,3 +19,5 @@ Course project at Warsaw Univeristy of Technology
 ## Clickhouse
 - To run queries go to Exec tab in docker compose and execute ``` cickhouse-client ``` command, clichkouse terminal shall appear
 - Execute ```USE BigDataAnalytics; SHOW TABLES;``` to see available tables in our project, note that the tables that directly ingest kafka are locked from reading, refer to their *_consumalbe version
+
+Fo troubleshooting cat server log files to cionsole and copy past into normal text editor, bot error and nonerror log files are useful for the purpose.
