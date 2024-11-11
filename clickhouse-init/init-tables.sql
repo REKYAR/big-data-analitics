@@ -311,3 +311,100 @@ FROM
     WHERE JSONHas(bars, 'bars') = 1
 )
 WHERE JSONLength(symbol_data.2) > 0;
+
+
+-- Gold Silver Setup
+-- Drop existing views and tables
+DROP VIEW IF EXISTS feed_consumer_kaggle_gold_silver;
+DROP TABLE IF EXISTS kaggle_gold_silver_raw_data;
+DROP TABLE IF EXISTS kaggle_gold_silver_consumable;
+
+-- Create raw data table connected to Kafka for Gold Silver
+CREATE TABLE IF NOT EXISTS kaggle_gold_silver_raw_data (
+    Date String,
+    Time String,
+    Open String,
+    High String,
+    Low String,
+    Close String,
+    Volume String
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'kaggle_gold_silver',
+    kafka_group_name = 'kaggle_gold_silver_group',
+    kafka_format = 'CSVWithNames',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 100,
+    kafka_num_consumers = 1;
+
+-- Create target table for processed Gold Silver data
+CREATE TABLE IF NOT EXISTS kaggle_gold_silver_consumable (
+    DateTime DateTime,
+    Open Float64,
+    High Float64,
+    Low Float64,
+    Close Float64,
+    Volume Float64
+) ENGINE = MergeTree()
+ORDER BY DateTime;
+
+-- Create materialized view for Gold Silver with type casting
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_kaggle_gold_silver 
+TO kaggle_gold_silver_consumable AS
+SELECT
+    parseDateTimeBestEffort(concat(Date, ' ', Time)) AS DateTime,
+    toFloat64OrNull(Open) AS Open,
+    toFloat64OrNull(High) AS High,
+    toFloat64OrNull(Low) AS Low,
+    toFloat64OrNull(Close) AS Close,
+    toFloat64OrNull(Volume) AS Volume
+FROM kaggle_gold_silver_raw_data;
+
+-- Gold Bronze Setup
+-- Drop existing views and tables
+DROP VIEW IF EXISTS feed_consumer_kaggle_gold_bronze;
+DROP TABLE IF EXISTS kaggle_gold_bronze_raw_data;
+DROP TABLE IF EXISTS kaggle_gold_bronze_consumable;
+
+-- Create raw data table connected to Kafka for Gold Bronze
+CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_raw_data (
+    Date String,
+    Time String,
+    Open String,
+    High String,
+    Low String,
+    Close String,
+    Volume String
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'kaggle_gold_bronze',
+    kafka_group_name = 'kaggle_gold_bronze_group',
+    kafka_format = 'CSVWithNames',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 100,
+    kafka_num_consumers = 1;
+
+-- Create target table for processed Gold Bronze data
+CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_consumable (
+    DateTime DateTime64(3),
+    Open Float64,
+    High Float64,
+    Low Float64,
+    Close Float64,
+    Volume Float64
+) ENGINE = MergeTree()
+ORDER BY DateTime;
+
+-- Create materialized view for Gold Bronze with type casting
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_kaggle_gold_bronze 
+TO kaggle_gold_bronze_consumable AS
+SELECT
+    parseDateTimeBestEffort(concat(Date, ' ', Time)) AS DateTime,
+    toFloat64OrNull(Open) AS Open,
+    toFloat64OrNull(High) AS High,
+    toFloat64OrNull(Low) AS Low,
+    toFloat64OrNull(Close) AS Close,
+    toFloat64OrNull(Volume) AS Volume
+FROM kaggle_gold_bronze_raw_data;
