@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS investingcom_bronze_raw_data
 ) ENGINE = Kafka()
 SETTINGS
     kafka_broker_list = 'kafka:9092',
-    kafka_topic_list = 'investingcom_bitcoin_bronze,investingcom_amzn_bronze,investingcom_tsla_bronze',
+    kafka_topic_list = 'investingcom_bronze',
     kafka_group_name = 'investingcom_clickhouse_group',
     kafka_format = 'LineAsString',
     kafka_row_delimiter = '\n',

@@ -3,11 +3,6 @@
 In this directory there are placed templates for NiFi flows for each data source.
 This file summarises the most important information related to them.
 
-## Secrets
-
-The following environment variables need to be set up in the `./secrets.env` file:
-- `FREECURRENCY_API_KEY`
-
 ## Input data
 
 Data files which should be manually placed:
@@ -20,7 +15,7 @@ The rest of the data is fetched inside NiFi.
 
 Steps 1-4 are needed to be performed only when running the flow for the first time, or if the templates are updated.
 
-1. Make sure you have an up-to-date `secrets.env` file in your repo, with the secrets specified above;
+1. Make sure you have an up-to-date `secrets.env` file in your repo;
 2. Import each template to NiFi. On the left-hand side, there is an "Operate" panel, and the button to upload templates is the last button in the first row of buttons;
 3. Add each template to the flow by dragging the template icon from the top bar onto the canvas (second-to-last icon); 
 4. Make sure that all controllers are running:
@@ -70,9 +65,7 @@ it is key for consumers to handle duplicate IDs across separate messages.
 
 ### investing.com data
 
-**Bronze topics:**`investingcom_{entity}_bronze`
-
-Entity is for example 'bitcoin', or 'amzn'. It is obtained by splitting a filename by spaces, taking the first element, and converting to lowercase.
+**Bronze topics:**`investingcom_bronze`
 
 **Silver topic:** `investingcom_silver`
 

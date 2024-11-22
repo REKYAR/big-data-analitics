@@ -68,9 +68,6 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 1
-      KAFKA_CREATE_TOPICS: "marketwatch_bronze:1:1,marketwatch_silver:1:1,freecurrencyapi_bronze:1:1,freecurrencyapi_silver:1:1,investingcom_bitcoin_bronze:1:1,investingcom_tsla_bronze:1:1,investingcom_amzn_bronze:1:1,investingcom_silver:1:1,kaggle_gold_bronze:1:1,kaggle_gold_silver:1:1,alpaca_bronze:1:1,alpaca_silver:1:1"
-
-
 
   grafana:
     image: grafana/grafana:latest
