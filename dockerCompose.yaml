@@ -24,7 +24,7 @@ services:
       - kafka
 
   nifi:
-    image: apache/nifi:latest
+    image: apache/nifi:1.28.0
     container_name: nifi
     ports:
       - "8443:8443"
