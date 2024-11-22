@@ -1,57 +1,55 @@
 CREATE DATABASE IF NOT EXISTS BigDataAnalytics;
 USE BigDataAnalytics;
--- SELECT sleep(3);
--- SELECT sleep(3);
--- SELECT sleep(3);
 
 
+----------------------------------
+------------ BRONZE --------------
+----------------------------------
 
 
--- marketwatch sivler
-drop VIEW if exists feed_consumeer_marketwatch_silver;
-drop TABLE if exists marketwatch_silver_raw_data;
-drop TABLE if exists marketwatch_silver_consumable;
+------------ Alpaca bronze --------------
 
-CREATE TABLE IF NOT EXISTS marketwatch_silver_raw_data (
-    id String,
-    feedTitle String,
-    title String,
-    description String,
-    date String
+-- Clean up existing objects
+DROP VIEW IF EXISTS feed_consumer_alpaca_bronze;
+DROP TABLE IF EXISTS alpaca_bronze_raw_data;
+DROP TABLE IF EXISTS alpaca_bronze_consumable;
+
+-- Create Kafka source table for bronze (JSON) data
+CREATE TABLE IF NOT EXISTS alpaca_bronze_raw_data (
+    raw_data String
 ) ENGINE = Kafka()
 SETTINGS
-    kafka_broker_list = 'kafka:9092',            -- replace with your Kafka broker list
-    kafka_topic_list = 'marketwatch_silver',           -- replace with your topic
-    kafka_group_name = 'marketwatch_clickhouse_group',
-    kafka_format = 'CSV',
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'alpaca_bronze',
+    kafka_group_name = 'alpaca_bronze_clickhouse_group',
+    kafka_format = 'LineAsString',
     kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 1,
     kafka_num_consumers = 1;
 
-CREATE TABLE IF NOT EXISTS marketwatch_silver_consumable (
-    id String,
-    feedTitle String,
-    title String,
-    description String,
-    date DateTime('UTC')  -- Assuming the incoming date is UTC
+-- Create target table for bronze processed data
+CREATE TABLE IF NOT EXISTS alpaca_bronze_consumable (
+    raw_data String,
+    processed_time DateTime DEFAULT now()
 ) ENGINE = MergeTree()
-ORDER BY id;
+ORDER BY (processed_time);
 
-CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumeer_marketwatch_silver TO marketwatch_silver_consumable
-AS
+-- Create materialized view to transform bronze data
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_alpaca_bronze 
+TO alpaca_bronze_consumable AS
 SELECT
-    id,
-    feedTitle,
-    title,
-    description,
-    parseDateTimeBestEffort(date) AS date
-FROM marketwatch_silver_raw_data;
+    raw_data,
+    now() as processed_time
+FROM alpaca_bronze_raw_data;
 
 
---marketwatch bronze
+
+
+--------------- MarketWatch bronze -----------------
+
 DROP VIEW IF EXISTS feed_consumer_marketwatch_bronze;
 DROP TABLE IF EXISTS marketwatch_bronze_raw_data;
 DROP TABLE IF EXISTS marketwatch_bronze_consumable;
-
 
 CREATE TABLE IF NOT EXISTS marketwatch_bronze_raw_data
 (
@@ -61,111 +59,115 @@ SETTINGS
     kafka_broker_list = 'kafka:9092',
     kafka_topic_list = 'marketwatch_bronze',
     kafka_group_name = 'marketwatch_clickhouse_group',
-    kafka_format = 'JSONAsString';
+    kafka_format = 'LineAsString',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 1,
+    kafka_num_consumers = 1;
 
 
 CREATE TABLE IF NOT EXISTS marketwatch_bronze_consumable
 (
-    channel_title String,
-    article_title String,
-    description Nullable(String),
-    link String,
-    pub_date DateTime,
-    author Nullable(String),
-    content_type Nullable(String),
-    content_url Nullable(String),
-    content_credit Nullable(String),
     raw_data String,
     processed_time DateTime DEFAULT now()
 ) ENGINE = MergeTree()
-ORDER BY (channel_title, pub_date);
+ORDER BY (processed_time);
 
 -- Create materialized view to parse and transform data
 CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_marketwatch_bronze 
 TO marketwatch_bronze_consumable AS
 SELECT
-    JSONExtractString(raw_data, 'channel', 'title') as channel_title,
-    JSONExtractString(item, 'title') as article_title,
-    JSONExtractString(item, 'description') as description,
-    JSONExtractString(item, 'link') as link,
-    parseDateTimeBestEffort(JSONExtractString(item, 'pubDate')) as pub_date,
-    JSONExtractString(item, 'author') as author,
-    JSONExtractString(JSONExtractString(item, 'content'), 'type') as content_type,
-    JSONExtractString(JSONExtractString(item, 'content'), 'url') as content_url,
-    JSONExtractString(JSONExtractString(item, 'content'), 'credit') as content_credit,
     raw_data,
     now() as processed_time
-FROM marketwatch_bronze_raw_data
-ARRAY JOIN JSONExtractArrayRaw(raw_data, 'channel', 'item') AS item
-WHERE length(raw_data) > 2;
+FROM marketwatch_bronze_raw_data;
 
 
--- investingcom silver
--- Drop existing views and tables
--- Drop existing views and tables
-DROP VIEW IF EXISTS feed_consumer_investingcom_silver;
-DROP TABLE IF EXISTS investingcom_silver_raw_data;
-DROP TABLE IF EXISTS investingcom_silver_consumable;
 
--- Create raw data table connected to Kafka
-CREATE TABLE IF NOT EXISTS investingcom_silver_raw_data (
-    Date String,
-    Price String,
-    Open String,
-    High String,
-    Low String,
-    `Vol.` String,
-    `Change %` String,
-    entity String
+
+--------------- Investingcom bronze ----------------
+
+DROP VIEW IF EXISTS feed_consumer_investingcom_bronze;
+DROP TABLE IF EXISTS investingcom_bronze_raw_data;
+DROP TABLE IF EXISTS investingcom_bronze_consumable;
+
+
+CREATE TABLE IF NOT EXISTS investingcom_bronze_raw_data
+(
+    raw_data String
 ) ENGINE = Kafka()
 SETTINGS
     kafka_broker_list = 'kafka:9092',
-    kafka_topic_list = 'investingcom_silver',
+    kafka_topic_list = 'investingcom_bronze',
     kafka_group_name = 'investingcom_clickhouse_group',
-    kafka_format = 'CSVWithNames',
+    kafka_format = 'LineAsString',
     kafka_row_delimiter = '\n',
-    kafka_skip_broken_messages = 100,
+    kafka_skip_broken_messages = 1,
     kafka_num_consumers = 1;
 
--- Create target table for processed data with proper types
-CREATE TABLE IF NOT EXISTS investingcom_silver_consumable (
-    Date Date,
-    Price Float64,
-    Open Float64,
-    High Float64,
-    Low Float64,
-    Volume Float64,
-    ChangePercent Float64,
-    entity String
+
+CREATE TABLE IF NOT EXISTS investingcom_bronze_consumable
+(
+    raw_data String,
+    processed_time DateTime DEFAULT now()
 ) ENGINE = MergeTree()
-ORDER BY (Date, entity);
+ORDER BY (processed_time);
 
--- Create materialized view with type casting
-CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_investingcom_silver 
-TO investingcom_silver_consumable AS
+-- Create materialized view to parse and transform data
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_investingcom_bronze 
+TO investingcom_bronze_consumable AS
 SELECT
-    parseDateTimeBestEffort(Date) AS Date,
-    toFloat64OrNull(replaceRegexpAll(Price, ',', '')) AS Price,
-    toFloat64OrNull(replaceRegexpAll(Open, ',', '')) AS Open,
-    toFloat64OrNull(replaceRegexpAll(High, ',', '')) AS High,
-    toFloat64OrNull(replaceRegexpAll(Low, ',', '')) AS Low,
-    -- Handle volume with K/M suffixes
-    toFloat64OrNull(replaceRegexpAll(
-        replaceRegexpAll(`Vol.`, '[KMB]', ''),
-        ',', ''
-    )) * 
-    CASE
-        WHEN endsWith(`Vol.`, 'K') THEN 1000
-        WHEN endsWith(`Vol.`, 'M') THEN 1000000
-        WHEN endsWith(`Vol.`, 'B') THEN 1000000000
-        ELSE 1
-    END AS Volume,
-    -- Remove % and convert to float
-    toFloat64OrNull(replaceRegexpAll(`Change %`, '%', '')) AS ChangePercent,
-    entity
-FROM investingcom_silver_raw_data;
+    raw_data,
+    now() as processed_time
+FROM investingcom_bronze_raw_data;
 
---alpaca bronze
+
+
+
+-------------- Kaggle gold bronze ----------------
+
+-- Drop existing views and tables
+DROP VIEW IF EXISTS feed_consumer_kaggle_gold_bronze;
+DROP TABLE IF EXISTS kaggle_gold_bronze_raw_data;
+DROP TABLE IF EXISTS kaggle_gold_bronze_consumable;
+
+-- Create raw data table connected to Kafka for Gold Bronze
+CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_raw_data (
+    raw_data String
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'kaggle_gold_bronze',
+    kafka_group_name = 'kaggle_gold_bronze_group',
+    kafka_format = 'LineAsString',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 1,
+    kafka_num_consumers = 1;
+
+-- Create target table for processed Gold Bronze data
+CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_consumable (
+    raw_data String,
+    processed_time DateTime DEFAULT now()
+) ENGINE = MergeTree()
+ORDER BY (processed_time);
+
+-- Create materialized view for Gold Bronze with type casting
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_kaggle_gold_bronze 
+TO kaggle_gold_bronze_consumable AS
+SELECT
+    raw_data,
+    now() as processed_time
+FROM kaggle_gold_bronze_raw_data;
+
+
+
+
+
+
+
+----------------------------------
+------------ SILVER --------------
+----------------------------------
+
+---------------- Alpaca silver ----------------------
 
 -- Clean up existing objects
 DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
@@ -254,66 +256,121 @@ FROM
 WHERE pair.2 IS NOT NULL;
 
 
--- Clean up existing objects
-DROP VIEW IF EXISTS feed_consumer_alpaca_bronze;
-DROP TABLE IF EXISTS alpaca_bronze_raw_data;
-DROP TABLE IF EXISTS alpaca_bronze_consumable;
 
--- Create Kafka source table for bronze (JSON) data
-CREATE TABLE IF NOT EXISTS alpaca_bronze_raw_data (
-    bars String
+
+------------------ MarketWatch silver -----------------
+
+drop VIEW if exists feed_consumeer_marketwatch_silver;
+drop TABLE if exists marketwatch_silver_raw_data;
+drop TABLE if exists marketwatch_silver_consumable;
+
+CREATE TABLE IF NOT EXISTS marketwatch_silver_raw_data (
+    id String,
+    feedTitle String,
+    title String,
+    description String,
+    date String
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',            -- replace with your Kafka broker list
+    kafka_topic_list = 'marketwatch_silver',           -- replace with your topic
+    kafka_group_name = 'marketwatch_clickhouse_group',
+    kafka_format = 'CSV',
+    kafka_row_delimiter = '\n',
+    kafka_num_consumers = 1;
+
+CREATE TABLE IF NOT EXISTS marketwatch_silver_consumable (
+    id String,
+    feedTitle String,
+    title String,
+    description String,
+    date DateTime('UTC')  -- Assuming the incoming date is UTC
+) ENGINE = MergeTree()
+ORDER BY id;
+
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumeer_marketwatch_silver TO marketwatch_silver_consumable
+AS
+SELECT
+    id,
+    feedTitle,
+    title,
+    description,
+    parseDateTimeBestEffort(date) AS date
+FROM marketwatch_silver_raw_data;
+
+
+
+
+---------------- Investingcom silver ------------
+
+-- Drop existing views and tables
+DROP VIEW IF EXISTS feed_consumer_investingcom_silver;
+DROP TABLE IF EXISTS investingcom_silver_raw_data;
+DROP TABLE IF EXISTS investingcom_silver_consumable;
+
+-- Create raw data table connected to Kafka
+CREATE TABLE IF NOT EXISTS investingcom_silver_raw_data (
+    Date String,
+    Price String,
+    Open String,
+    High String,
+    Low String,
+    `Vol.` String,
+    `Change %` String,
+    entity String
 ) ENGINE = Kafka()
 SETTINGS
     kafka_broker_list = 'kafka:9092',
-    kafka_topic_list = 'alpaca_bronze',
-    kafka_group_name = 'alpaca_bronze_clickhouse_group',
-    kafka_format = 'JSONAsString',
+    kafka_topic_list = 'investingcom_silver',
+    kafka_group_name = 'investingcom_clickhouse_group',
+    kafka_format = 'CSVWithNames',
     kafka_row_delimiter = '\n',
-    kafka_skip_broken_messages = 1,
+    kafka_skip_broken_messages = 100,
     kafka_num_consumers = 1;
 
--- Create target table for bronze processed data
-CREATE TABLE IF NOT EXISTS alpaca_bronze_consumable (
-    symbol String,
-    timestamp DateTime('UTC'),
-    open Float64,
-    high Float64,
-    low Float64,
-    close Float64,
-    volume Float64,
-    number_of_trades Int32,
-    vwap Float64,
-    update_time DateTime('UTC') DEFAULT now()
+-- Create target table for processed data with proper types
+CREATE TABLE IF NOT EXISTS investingcom_silver_consumable (
+    Date Date,
+    Price Float64,
+    Open Float64,
+    High Float64,
+    Low Float64,
+    Volume Float64,
+    ChangePercent Float64,
+    entity String
 ) ENGINE = MergeTree()
-ORDER BY (symbol, timestamp);
+ORDER BY (Date, entity);
 
--- Create materialized view to transform bronze data
-CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_alpaca_bronze 
-TO alpaca_bronze_consumable AS
+-- Create materialized view with type casting
+CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_investingcom_silver 
+TO investingcom_silver_consumable AS
 SELECT
-    symbol_data.1 AS symbol,
-    parseDateTimeBestEffort(JSONExtractString(symbol_data.2, 't')) AS timestamp,
-    JSONExtractFloat(symbol_data.2, 'o') AS open,
-    JSONExtractFloat(symbol_data.2, 'h') AS high,
-    JSONExtractFloat(symbol_data.2, 'l') AS low,
-    JSONExtractFloat(symbol_data.2, 'c') AS close,
-    coalesce(JSONExtractFloat(symbol_data.2, 'v'), 0) AS volume,
-    coalesce(JSONExtractInt(symbol_data.2, 'n'), 0) AS number_of_trades,
-    coalesce(JSONExtractFloat(symbol_data.2, 'vw'), 0) AS vwap
-FROM 
-(
-    SELECT
-        arrayJoin(JSONExtractKeysAndValues(
-            JSONExtractString(bars, 'bars'),
-            'String'  -- Specify the key type
-        )) AS symbol_data
-    FROM alpaca_bronze_raw_data
-    WHERE JSONHas(bars, 'bars') = 1
-)
-WHERE JSONLength(symbol_data.2) > 0;
+    parseDateTimeBestEffort(Date) AS Date,
+    toFloat64OrNull(replaceRegexpAll(Price, ',', '')) AS Price,
+    toFloat64OrNull(replaceRegexpAll(Open, ',', '')) AS Open,
+    toFloat64OrNull(replaceRegexpAll(High, ',', '')) AS High,
+    toFloat64OrNull(replaceRegexpAll(Low, ',', '')) AS Low,
+    -- Handle volume with K/M suffixes
+    toFloat64OrNull(replaceRegexpAll(
+        replaceRegexpAll(`Vol.`, '[KMB]', ''),
+        ',', ''
+    )) * 
+    CASE
+        WHEN endsWith(`Vol.`, 'K') THEN 1000
+        WHEN endsWith(`Vol.`, 'M') THEN 1000000
+        WHEN endsWith(`Vol.`, 'B') THEN 1000000000
+        ELSE 1
+    END AS Volume,
+    -- Remove % and convert to float
+    toFloat64OrNull(replaceRegexpAll(`Change %`, '%', '')) AS ChangePercent,
+    entity
+FROM investingcom_silver_raw_data;
 
 
--- Gold Silver Setup
+
+
+----------------- Kaggle gold silver -----------------------
+
 -- Drop existing views and tables
 DROP VIEW IF EXISTS feed_consumer_kaggle_gold_silver;
 DROP TABLE IF EXISTS kaggle_gold_silver_raw_data;
@@ -360,51 +417,3 @@ SELECT
     toFloat64OrNull(Close) AS Close,
     toFloat64OrNull(Volume) AS Volume
 FROM kaggle_gold_silver_raw_data;
-
--- Gold Bronze Setup
--- Drop existing views and tables
-DROP VIEW IF EXISTS feed_consumer_kaggle_gold_bronze;
-DROP TABLE IF EXISTS kaggle_gold_bronze_raw_data;
-DROP TABLE IF EXISTS kaggle_gold_bronze_consumable;
-
--- Create raw data table connected to Kafka for Gold Bronze
-CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_raw_data (
-    Date String,
-    Time String,
-    Open String,
-    High String,
-    Low String,
-    Close String,
-    Volume String
-) ENGINE = Kafka()
-SETTINGS
-    kafka_broker_list = 'kafka:9092',
-    kafka_topic_list = 'kaggle_gold_bronze',
-    kafka_group_name = 'kaggle_gold_bronze_group',
-    kafka_format = 'CSVWithNames',
-    kafka_row_delimiter = '\n',
-    kafka_skip_broken_messages = 100,
-    kafka_num_consumers = 1;
-
--- Create target table for processed Gold Bronze data
-CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_consumable (
-    DateTime DateTime64(3),
-    Open Float64,
-    High Float64,
-    Low Float64,
-    Close Float64,
-    Volume Float64
-) ENGINE = MergeTree()
-ORDER BY DateTime;
-
--- Create materialized view for Gold Bronze with type casting
-CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_kaggle_gold_bronze 
-TO kaggle_gold_bronze_consumable AS
-SELECT
-    parseDateTimeBestEffort(concat(Date, ' ', Time)) AS DateTime,
-    toFloat64OrNull(Open) AS Open,
-    toFloat64OrNull(High) AS High,
-    toFloat64OrNull(Low) AS Low,
-    toFloat64OrNull(Close) AS Close,
-    toFloat64OrNull(Volume) AS Volume
-FROM kaggle_gold_bronze_raw_data;

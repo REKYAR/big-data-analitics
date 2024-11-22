@@ -5,9 +5,9 @@
     <name>investingcom</name>
     <snippet>
         <connections>
-            <id>6a93a39a-f9c5-35cd-0000-000000000000</id>
+            <id>6b4bc5c4-814d-332d-0000-000000000000</id>
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
-            <versionedComponentId>6a93a39a-f9c5-35cd-ac7e-a46a47648b55</versionedComponentId>
+            <versionedComponentId>6b4bc5c4-814d-332d-a7bb-5e576ea47c6a</versionedComponentId>
             <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
             <backPressureObjectThreshold>10000</backPressureObjectThreshold>
             <destination>
@@ -26,9 +26,9 @@
             <selectedRelationships>success</selectedRelationships>
             <source>
                 <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
-                <id>ef039266-07d3-3dbf-0000-000000000000</id>
+                <id>45cb25ab-9cca-399a-0000-000000000000</id>
                 <type>PROCESSOR</type>
-                <versionedComponentId>ef039266-07d3-3dbf-b8d0-0765773f82a2</versionedComponentId>
+                <versionedComponentId>45cb25ab-9cca-399a-ba0c-faeb836d72dc</versionedComponentId>
             </source>
             <zIndex>0</zIndex>
         </connections>
@@ -63,6 +63,7 @@
         <connections>
             <id>e79dd5c6-8231-3f1d-0000-000000000000</id>
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
+            <versionedComponentId>e79dd5c6-8231-3f1d-9484-cdec6c9010dc</versionedComponentId>
             <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
             <backPressureObjectThreshold>10000</backPressureObjectThreshold>
             <destination>
@@ -70,6 +71,34 @@
                 <id>66bd6c25-e83f-37f7-0000-000000000000</id>
                 <type>PROCESSOR</type>
                 <versionedComponentId>66bd6c25-e83f-37f7-8dfb-05d9063e9334</versionedComponentId>
+            </destination>
+            <flowFileExpiration>0 sec</flowFileExpiration>
+            <labelIndex>1</labelIndex>
+            <loadBalanceCompression>DO_NOT_COMPRESS</loadBalanceCompression>
+            <loadBalancePartitionAttribute></loadBalancePartitionAttribute>
+            <loadBalanceStatus>LOAD_BALANCE_NOT_CONFIGURED</loadBalanceStatus>
+            <loadBalanceStrategy>DO_NOT_LOAD_BALANCE</loadBalanceStrategy>
+            <name></name>
+            <selectedRelationships>success</selectedRelationships>
+            <source>
+                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
+                <id>ef039266-07d3-3dbf-0000-000000000000</id>
+                <type>PROCESSOR</type>
+                <versionedComponentId>ef039266-07d3-3dbf-b8d0-0765773f82a2</versionedComponentId>
+            </source>
+            <zIndex>0</zIndex>
+        </connections>
+        <connections>
+            <id>edbac9cf-1d8e-3ac8-0000-000000000000</id>
+            <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
+            <versionedComponentId>edbac9cf-1d8e-3ac8-8768-4e4600a488ef</versionedComponentId>
+            <backPressureDataSizeThreshold>1 GB</backPressureDataSizeThreshold>
+            <backPressureObjectThreshold>10000</backPressureObjectThreshold>
+            <destination>
+                <groupId>1f0cc74d-8ceb-3906-0000-000000000000</groupId>
+                <id>45cb25ab-9cca-399a-0000-000000000000</id>
+                <type>PROCESSOR</type>
+                <versionedComponentId>45cb25ab-9cca-399a-ba0c-faeb836d72dc</versionedComponentId>
             </destination>
             <flowFileExpiration>0 sec</flowFileExpiration>
             <labelIndex>1</labelIndex>
@@ -711,7 +740,7 @@
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
             <position>
                 <x>0.0</x>
-                <y>184.0</y>
+                <y>384.0</y>
             </position>
             <versionedComponentId>f1b61be3-da30-3709-927b-82cbecfa02e1</versionedComponentId>
             <height>184.0</height>
@@ -734,7 +763,7 @@
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
             <position>
                 <x>176.0</x>
-                <y>672.0</y>
+                <y>872.0</y>
             </position>
             <versionedComponentId>06c34ee2-88f4-3543-aee3-669578abc2cf</versionedComponentId>
             <bundle>
@@ -1126,7 +1155,7 @@
                 <name>success</name>
                 <retry>false</retry>
             </relationships>
-            <state>STOPPED</state>
+            <state>RUNNING</state>
             <style>
                 <entry>
                     <key>background-color</key>
@@ -1136,11 +1165,106 @@
             <type>org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_2_6</type>
         </processors>
         <processors>
+            <id>45cb25ab-9cca-399a-0000-000000000000</id>
+            <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
+            <position>
+                <x>176.0</x>
+                <y>208.0</y>
+            </position>
+            <versionedComponentId>45cb25ab-9cca-399a-ba0c-faeb836d72dc</versionedComponentId>
+            <bundle>
+                <artifact>nifi-standard-nar</artifact>
+                <group>org.apache.nifi</group>
+                <version>1.28.0</version>
+            </bundle>
+            <config>
+                <backoffMechanism>PENALIZE_FLOWFILE</backoffMechanism>
+                <bulletinLevel>WARN</bulletinLevel>
+                <comments></comments>
+                <concurrentlySchedulableTaskCount>1</concurrentlySchedulableTaskCount>
+                <descriptors>
+                    <entry>
+                        <key>record-reader</key>
+                        <value>
+                            <identifiesControllerService>org.apache.nifi.serialization.RecordReaderFactory</identifiesControllerService>
+                            <name>record-reader</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>record-writer</key>
+                        <value>
+                            <identifiesControllerService>org.apache.nifi.serialization.RecordSetWriterFactory</identifiesControllerService>
+                            <name>record-writer</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>replacement-value-strategy</key>
+                        <value>
+                            <name>replacement-value-strategy</name>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>/filename</key>
+                        <value>
+                            <name>/filename</name>
+                        </value>
+                    </entry>
+                </descriptors>
+                <executionNode>ALL</executionNode>
+                <lossTolerant>false</lossTolerant>
+                <maxBackoffPeriod>10 mins</maxBackoffPeriod>
+                <penaltyDuration>30 sec</penaltyDuration>
+                <properties>
+                    <entry>
+                        <key>record-reader</key>
+                        <value>537976e8-ab44-3f09-0000-000000000000</value>
+                    </entry>
+                    <entry>
+                        <key>record-writer</key>
+                        <value>e64c6b6f-cccf-3eb2-0000-000000000000</value>
+                    </entry>
+                    <entry>
+                        <key>replacement-value-strategy</key>
+                        <value>literal-value</value>
+                    </entry>
+                    <entry>
+                        <key>/filename</key>
+                        <value>${filename}</value>
+                    </entry>
+                </properties>
+                <retryCount>0</retryCount>
+                <runDurationMillis>0</runDurationMillis>
+                <schedulingPeriod>0 sec</schedulingPeriod>
+                <schedulingStrategy>TIMER_DRIVEN</schedulingStrategy>
+                <yieldDuration>1 sec</yieldDuration>
+            </config>
+            <executionNodeRestricted>false</executionNodeRestricted>
+            <name>AddFilenameColumn</name>
+            <relationships>
+                <autoTerminate>true</autoTerminate>
+                <name>failure</name>
+                <retry>false</retry>
+            </relationships>
+            <relationships>
+                <autoTerminate>false</autoTerminate>
+                <name>success</name>
+                <retry>false</retry>
+            </relationships>
+            <state>RUNNING</state>
+            <style>
+                <entry>
+                    <key>background-color</key>
+                    <value>#ffffff</value>
+                </entry>
+            </style>
+            <type>org.apache.nifi.processors.standard.UpdateRecord</type>
+        </processors>
+        <processors>
             <id>66bd6c25-e83f-37f7-0000-000000000000</id>
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
             <position>
                 <x>176.0</x>
-                <y>472.0</y>
+                <y>672.0</y>
             </position>
             <versionedComponentId>66bd6c25-e83f-37f7-8dfb-05d9063e9334</versionedComponentId>
             <bundle>
@@ -1221,7 +1345,7 @@
                 <name>success</name>
                 <retry>false</retry>
             </relationships>
-            <state>STOPPED</state>
+            <state>RUNNING</state>
             <style>
                 <entry>
                     <key>background-color</key>
@@ -1500,7 +1624,7 @@
                     </entry>
                     <entry>
                         <key>topic</key>
-                        <value>investingcom_${filename:getDelimitedField(1,' '):toLower()}_bronze</value>
+                        <value>investingcom_bronze</value>
                     </entry>
                     <entry>
                         <key>record-reader</key>
@@ -1627,7 +1751,7 @@
                 <name>success</name>
                 <retry>false</retry>
             </relationships>
-            <state>STOPPED</state>
+            <state>RUNNING</state>
             <style>
                 <entry>
                     <key>background-color</key>
@@ -1641,7 +1765,7 @@
             <parentGroupId>1f0cc74d-8ceb-3906-0000-000000000000</parentGroupId>
             <position>
                 <x>176.0</x>
-                <y>224.0</y>
+                <y>424.0</y>
             </position>
             <versionedComponentId>ef039266-07d3-3dbf-b8d0-0765773f82a2</versionedComponentId>
             <bundle>
@@ -1792,7 +1916,7 @@
                 <name>success</name>
                 <retry>false</retry>
             </relationships>
-            <state>STOPPED</state>
+            <state>RUNNING</state>
             <style>
                 <entry>
                     <key>background-color</key>
@@ -1802,5 +1926,5 @@
             <type>org.apache.nifi.processors.standard.GetFile</type>
         </processors>
     </snippet>
-    <timestamp>11/04/2024 10:30:32 UTC</timestamp>
+    <timestamp>11/22/2024 14:37:42 UTC</timestamp>
 </template>
