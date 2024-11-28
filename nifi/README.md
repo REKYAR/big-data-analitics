@@ -6,27 +6,26 @@ This file summarises the most important information related to them.
 ## Input data
 
 Data files which should be manually placed:
-- investing.com: place in `./local/BIG_DATA/investingcom/`
-- Kaggle's gold data: place in `./local/BIG_DATA/gold/`
+- investing.com: place in `./nifi/volumes/BIG_DATA/investingcom/`
+- Kaggle's gold data: place in `./nifi/volumes/BIG_DATA/gold/`
 
 The rest of the data is fetched inside NiFi.
 
 ## How to run the flow
 
-Steps 1-4 are needed to be performed only when running the flow for the first time, or if the templates are updated.
+Steps 1-3 are needed to be performed only when running the flow for the first time, or if the templates are updated.
 
-1. Make sure you have an up-to-date `secrets.env` file in your repo;
-2. Import each template to NiFi. On the left-hand side, there is an "Operate" panel, and the button to upload templates is the last button in the first row of buttons;
-3. Add each template to the flow by dragging the template icon from the top bar onto the canvas (second-to-last icon); 
-4. Make sure that all controllers are running:
+1. Import each template to NiFi. On the left-hand side, there is an "Operate" panel, and the button to upload templates is the last button in the first row of buttons;
+2. Add each template to the flow by dragging the template icon from the top bar onto the canvas (second-to-last icon); 
+3. Make sure that all controllers are running:
    - In the "Operate" panel, click on the settings icon. A window will show up;
    - In the top bar, navigate to "Controller services";
    - Make sure that the "XMLRecordSetWriter" controller has "Name of Record Tag" property set to rss. If not, set it;
    - For each controller, press the lightning icon on the right-hand side to start it (if it is running, the icon will show a crossed-out lightning and there will be no delete icon);
    - Once all controllers are running you can close the settings window;
-5. At this point there should be no more warnings (triangular exclamation mark icons on the processors); If there are any then abort and consult it with the team;
-6. Place the necessary input files in their specified directories (see "Input data" section above);
-7. Press CTRL+A to select all processors, and click the start button in the "Operate" panel.
+4. At this point there should be no more warnings (triangular exclamation mark icons on the processors); If there are any then abort and consult it with the team;
+5. Place the necessary input files in their specified directories (see "Input data" section above);
+6. Press CTRL+A to select all processors, and click the start button in the "Operate" panel.
 
 ## Processors colours guide
 

@@ -1,5 +1,8 @@
 # large input files
-local/BIG_DATA
+nifi/volumes/BIG_DATA
+
+# grafana auto generated
+grafana/volumes/data
 
 # secrets
 secrets.env
