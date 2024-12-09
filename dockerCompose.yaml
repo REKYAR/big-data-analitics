@@ -81,3 +81,14 @@ services:
       - ./grafana/volumes/provisioning:/etc/grafana/provisioning
     depends_on:
       - clickhouse
+
+  stream_ml:
+    image: stream_ml
+    build:
+      context: ./stream_ml
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    depends_on:
+      - kafka
+      - clickhouse
