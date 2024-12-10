@@ -11,4 +11,4 @@ COPY ./stream_ml /code/stream_ml
 EXPOSE 5000
 
 # CMD ["uvicorn", "query_api.main:app", "--host", "0.0.0.0", "--port", "80", "&&", "python", "query_api.simulate_request.py" uvicorn query_api.main:app --host 0.0.0.0 --port 80 && ]
-CMD ["bash", "-c", "python3 stream_ml/ml.py"]
+CMD ["bash", "-c", "python3 -u stream_ml/ml.py"]

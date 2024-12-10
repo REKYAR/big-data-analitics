@@ -11,6 +11,9 @@ USE BigDataAnalytics;
 -- DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
 -- DROP TABLE IF EXISTS alpaca_silver_raw_data;
 -- DROP TABLE IF EXISTS alpaca_silver_consumable;
+DROP VIEW IF EXISTS alpaca_silver_predictions_view;
+DROP TABLE IF EXISTS alpaca_silver_predictions;
+DROP TABLE IF EXISTS alpaca_silver_predictions_queryable;
 
 -- Create Kafka source table for silver (CSV) data
 CREATE TABLE IF NOT EXISTS alpaca_silver_raw_data (
@@ -55,6 +58,39 @@ CREATE TABLE IF NOT EXISTS alpaca_silver_consumable (
     update_time DateTime('UTC') DEFAULT now()
 ) ENGINE = MergeTree()
 ORDER BY (symbol, timestamp);
+
+-- Create target table for predictions
+CREATE TABLE IF NOT EXISTS alpaca_silver_predictions (
+    symbol String,
+    price_timestamp DateTime('UTC'),
+    predicted_price Float64
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'alpaca_predictions',
+    kafka_group_name = 'alpaca_predictions_clickhouse_group',
+    kafka_format = 'CSV',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 1,
+    kafka_num_consumers = 1;
+
+-- Create table for queryable predictions
+CREATE TABLE IF NOT EXISTS alpaca_silver_predictions_queryable (
+    symbol String,
+    price_timestamp DateTime('UTC'),
+    predicted_price Float64
+) ENGINE = MergeTree()
+ORDER BY (symbol, price_timestamp);
+
+-- Create materialized view for querability of predictions
+CREATE MATERIALIZED VIEW IF NOT EXISTS alpaca_silver_predictions_view
+TO alpaca_silver_predictions_queryable
+AS
+SELECT
+    symbol,
+    price_timestamp,
+    predicted_price
+FROM alpaca_silver_predictions;
 
 -- Create materialized view to transform silver data
 CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_alpaca_silver 

@@ -82,7 +82,8 @@ class MultiPairPredictor:
             # Only process pairs that are present in this message
             for pair, value in parsed_data['data'].items():
                 predictor = self.predictors[pair]
-                prediction = predictor.process_message(value, parsed_data['timestamp'])
+                timestamp = parsed_data['timestamp']
+                prediction = predictor.process_message(value, timestamp)
                 if prediction is not None:
                     predictions[pair] = prediction
                     
@@ -163,7 +164,7 @@ class SinglePairPredictor:
         current_time = datetime.now()
         while self.prediction_buffer:
             oldest_entry = self.prediction_buffer[0]
-            if current_time - oldest_entry['timestamp'] > self.learning_delay * 2:
+            if current_time - oldest_entry['timestamp'] > self.learning_delay * 5:
                 self.prediction_buffer.popleft()
             else:
                 break
