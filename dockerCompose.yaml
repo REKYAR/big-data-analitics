@@ -10,6 +10,7 @@ services:
     volumes:
       - ./clickhouse/config:/etc/clickhouse-server/config.d
       - ./clickhouse/tables_init:/docker-entrypoint-initdb.d
+      # - ./clickhouse/userconfig:/etc/clickhouse-server/users.d
     environment:
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: default

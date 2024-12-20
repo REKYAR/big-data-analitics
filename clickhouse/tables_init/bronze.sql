@@ -8,9 +8,9 @@ USE BigDataAnalytics;
 
 -- Clean up existing objects
 
--- DROP VIEW IF EXISTS feed_consumer_alpaca_bronze;
--- DROP TABLE IF EXISTS alpaca_bronze_raw_data;
--- DROP TABLE IF EXISTS alpaca_bronze_consumable;
+DROP VIEW IF EXISTS feed_consumer_alpaca_bronze;
+DROP TABLE IF EXISTS alpaca_bronze_raw_data;
+DROP TABLE IF EXISTS alpaca_bronze_consumable;
 
 -- Create Kafka source table for bronze (JSON) data
 CREATE TABLE IF NOT EXISTS alpaca_bronze_raw_data (
@@ -45,9 +45,9 @@ FROM alpaca_bronze_raw_data;
 
 --------------- MarketWatch bronze -----------------
 
--- DROP VIEW IF EXISTS feed_consumer_marketwatch_bronze;
--- DROP TABLE IF EXISTS marketwatch_bronze_raw_data;
--- DROP TABLE IF EXISTS marketwatch_bronze_consumable;
+DROP VIEW IF EXISTS feed_consumer_marketwatch_bronze;
+DROP TABLE IF EXISTS marketwatch_bronze_raw_data;
+DROP TABLE IF EXISTS marketwatch_bronze_consumable;
 
 CREATE TABLE IF NOT EXISTS marketwatch_bronze_raw_data
 (
@@ -83,9 +83,9 @@ FROM marketwatch_bronze_raw_data;
 
 --------------- Investingcom bronze ----------------
 
--- DROP VIEW IF EXISTS feed_consumer_investingcom_bronze;
--- DROP TABLE IF EXISTS investingcom_bronze_raw_data;
--- DROP TABLE IF EXISTS investingcom_bronze_consumable;
+DROP VIEW IF EXISTS feed_consumer_investingcom_bronze;
+DROP TABLE IF EXISTS investingcom_bronze_raw_data;
+DROP TABLE IF EXISTS investingcom_bronze_consumable;
 
 
 CREATE TABLE IF NOT EXISTS investingcom_bronze_raw_data
@@ -124,9 +124,9 @@ FROM investingcom_bronze_raw_data;
 
 -- Drop existing views and tables
 
--- DROP VIEW IF EXISTS feed_consumer_kaggle_gold_bronze;
--- DROP TABLE IF EXISTS kaggle_gold_bronze_raw_data;
--- DROP TABLE IF EXISTS kaggle_gold_bronze_consumable;
+DROP VIEW IF EXISTS feed_consumer_kaggle_gold_bronze;
+DROP TABLE IF EXISTS kaggle_gold_bronze_raw_data;
+DROP TABLE IF EXISTS kaggle_gold_bronze_consumable;
 
 -- Create raw data table connected to Kafka for Gold Bronze
 CREATE TABLE IF NOT EXISTS kaggle_gold_bronze_raw_data (

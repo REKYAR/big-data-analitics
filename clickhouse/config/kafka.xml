@@ -1,5 +1,0 @@
-<clickhouse>
-    <kafka>
-        <debug>all</debug>
-    </kafka>
-</clickhouse>

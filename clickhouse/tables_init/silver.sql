@@ -8,9 +8,9 @@ USE BigDataAnalytics;
 
 -- Clean up existing objects
 
--- DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
--- DROP TABLE IF EXISTS alpaca_silver_raw_data;
--- DROP TABLE IF EXISTS alpaca_silver_consumable;
+DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
+DROP TABLE IF EXISTS alpaca_silver_raw_data;
+DROP TABLE IF EXISTS alpaca_silver_consumable;
 
 -- Create Kafka source table for silver (CSV) data
 CREATE TABLE IF NOT EXISTS alpaca_silver_raw_data (
@@ -98,9 +98,9 @@ WHERE pair.2 IS NOT NULL;
 
 ------------------ MarketWatch silver -----------------
 
--- drop VIEW if exists feed_consumeer_marketwatch_silver;
--- drop TABLE if exists marketwatch_silver_raw_data;
--- drop TABLE if exists marketwatch_silver_consumable;
+drop VIEW if exists feed_consumeer_marketwatch_silver;
+drop TABLE if exists marketwatch_silver_raw_data;
+drop TABLE if exists marketwatch_silver_consumable;
 
 CREATE TABLE IF NOT EXISTS marketwatch_silver_raw_data (
     id String,
@@ -143,9 +143,9 @@ FROM marketwatch_silver_raw_data;
 
 -- Drop existing views and tables
 
--- DROP VIEW IF EXISTS feed_consumer_investingcom_silver;
--- DROP TABLE IF EXISTS investingcom_silver_raw_data;
--- DROP TABLE IF EXISTS investingcom_silver_consumable;
+DROP VIEW IF EXISTS feed_consumer_investingcom_silver;
+DROP TABLE IF EXISTS investingcom_silver_raw_data;
+DROP TABLE IF EXISTS investingcom_silver_consumable;
 
 -- Create raw data table connected to Kafka
 CREATE TABLE IF NOT EXISTS investingcom_silver_raw_data (
@@ -212,9 +212,9 @@ FROM investingcom_silver_raw_data;
 
 -- Drop existing views and tables
 
--- DROP VIEW IF EXISTS feed_consumer_kaggle_gold_silver;
--- DROP TABLE IF EXISTS kaggle_gold_silver_raw_data;
--- DROP TABLE IF EXISTS kaggle_gold_silver_consumable;
+DROP VIEW IF EXISTS feed_consumer_kaggle_gold_silver;
+DROP TABLE IF EXISTS kaggle_gold_silver_raw_data;
+DROP TABLE IF EXISTS kaggle_gold_silver_consumable;
 
 -- Create raw data table connected to Kafka for Gold Silver
 CREATE TABLE IF NOT EXISTS kaggle_gold_silver_raw_data (
