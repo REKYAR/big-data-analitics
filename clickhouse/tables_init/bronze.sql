@@ -4,9 +4,9 @@ USE BigDataAnalytics;
 
 
 
------------- Alpaca bronze --------------
+-- ------------ Alpaca bronze --------------
 
--- Clean up existing objects
+-- -- Clean up existing objects
 
 -- DROP VIEW IF EXISTS feed_consumer_alpaca_bronze;
 -- DROP TABLE IF EXISTS alpaca_bronze_raw_data;

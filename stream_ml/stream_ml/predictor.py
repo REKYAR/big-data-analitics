@@ -1,4 +1,5 @@
 from river import neighbors, preprocessing
+from kafka import KafkaConsumer, KafkaProducer, errors
 from collections import deque
 from datetime import datetime, timedelta
 import json
@@ -9,7 +10,7 @@ from io import StringIO
 import numpy as np
 
 class MultiPairPredictor:
-    def __init__(self, target_pairs: List[str], learning_delay_minutes: int = 1):
+    def __init__(self, target_pairs: List[str], metrics_producer: KafkaProducer, learning_delay_minutes: int = 1):
         """
         Initialize predictors for multiple trading pairs.
         
@@ -22,6 +23,7 @@ class MultiPairPredictor:
             for pair in target_pairs
         }
         self.most_recent_prices = {pair: [datetime.now().isoformat(), 0] for pair in target_pairs}
+        self.metrics_producer = metrics_producer
 
     def _get_row(self, message: str, row_number: int) -> List[str]:
         """Get a specific row from a CSV message."""
@@ -111,14 +113,44 @@ class MultiPairPredictor:
         except ValueError as e:
             print(f"Warning: Skipping invalid message for historical update: {str(e)}")
 
+    def send_metrics(self, metrics_id: int):
+        """Send metrics for all available pairs."""
+        def calculate_mape(predictions, prices):
+            return np.mean(np.abs(np.array(predictions) - np.array(prices)) / np.array(prices))
+
+        def calculate_rmse(predictions, prices):
+            return np.sqrt(np.mean((np.array(predictions) - np.array(prices)) ** 2))
+
+        for pair, predictor in self.predictors.items():
+            if len(predictor.last_10_features) < 10:
+                print(f"Warning: Not enough data to calculate metrics for {pair}, only {len(predictor.last_10_features)} samples available")
+                continue
+            try:
+                predictions = []
+                for feature in predictor.last_10_features:
+                    predictions.append(predictor.model.predict_one(feature))
+                self.metrics_producer.send(
+                    'model_metrics',
+                    value=f"{metrics_id},alpaca_{pair},{'MAPE'},{calculate_mape(predictions, predictor.last_10_prices)},{datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}".encode('utf-8')
+                    )
+                self.metrics_producer.send(
+                    'model_metrics',
+                    value=f"{metrics_id},alpaca_{pair},{'RMSE'},{calculate_rmse(predictions, predictor.last_10_prices)},{datetime.now().strftime('%Y-%m-%dT%H:%M:%S')}".encode('utf-8')
+                    )
+            except errors.KafkaError as e:
+                print(f"Warning: Error sending metrics for {pair}: {str(e)}")
+
 class SinglePairPredictor:
-    def __init__(self, target_pair: str, learning_delay_minutes: int = 1):
+    def __init__(self, target_pair: str, metrics_producer: KafkaProducer, learning_delay_minutes: int = 1):
         self.target_pair = target_pair
         self.model = preprocessing.StandardScaler() | neighbors.KNNRegressor(
             n_neighbors=5
         )
         self.prediction_buffer = deque()
         self.learning_delay = timedelta(minutes=learning_delay_minutes)
+        self.last_10_features = deque(maxlen=10)
+        self.last_10_prices = deque(maxlen=10)
+        self.last_timestamp = None
         
     def _extract_features(self, price: float) -> Dict:
         """Extract features from the price data."""
@@ -132,7 +164,7 @@ class SinglePairPredictor:
             
             self.prediction_buffer.append({
                 'features': features,
-                'timestamp': timestamp,
+                'timestamp': timestamp + timedelta(minutes=1),
                 'actual_price': None
             })
             
@@ -146,15 +178,21 @@ class SinglePairPredictor:
     
     def update_historical_price(self, price: float, timestamp: datetime):
         """Update model with historical price."""
+
         try:
             current_time = timestamp
-            
             for entry in self.prediction_buffer:
                 time_diff = current_time - entry['timestamp']
+                if self.last_timestamp is None or entry['timestamp'] > self.last_timestamp:
+                    self.last_timestamp = entry['timestamp']
                 
-                if time_diff >= self.learning_delay and entry['actual_price'] is None:
+                if entry['actual_price'] is None:
+                    self.last_10_features.append(entry['features'])
+                    self.last_10_prices.append(price)
                     entry['actual_price'] = price
                     self.model.learn_one(entry['features'], entry['actual_price'])
+
+
                     
         except Exception as e:
             print(f"Warning: Error updating historical price for {self.target_pair}: {str(e)}")
@@ -163,8 +201,8 @@ class SinglePairPredictor:
         """Remove old entries from the prediction buffer."""
         current_time = datetime.now()
         while self.prediction_buffer:
-            oldest_entry = self.prediction_buffer[0]
-            if current_time - oldest_entry['timestamp'] > self.learning_delay * 5:
+            oldest_entry = self.prediction_buffer[0]['timestamp']
+            if current_time - oldest_entry > self.learning_delay * 3:
                 self.prediction_buffer.popleft()
             else:
                 break

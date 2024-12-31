@@ -8,12 +8,15 @@ USE BigDataAnalytics;
 
 -- Clean up existing objects
 
--- DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
--- DROP TABLE IF EXISTS alpaca_silver_raw_data;
--- DROP TABLE IF EXISTS alpaca_silver_consumable;
+DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
+DROP TABLE IF EXISTS alpaca_silver_raw_data;
+DROP TABLE IF EXISTS alpaca_silver_consumable;
+
 DROP VIEW IF EXISTS alpaca_silver_predictions_view;
 DROP TABLE IF EXISTS alpaca_silver_predictions;
 DROP TABLE IF EXISTS alpaca_silver_predictions_queryable;
+
+DROP TABLE IF EXISTS model_metrics;
 
 -- Create Kafka source table for silver (CSV) data
 CREATE TABLE IF NOT EXISTS alpaca_silver_raw_data (
@@ -62,7 +65,7 @@ ORDER BY (symbol, timestamp);
 -- Create target table for predictions
 CREATE TABLE IF NOT EXISTS alpaca_silver_predictions (
     symbol String,
-    price_timestamp DateTime('UTC'),
+    price_timestamp DateTime,
     predicted_price Float64
 ) ENGINE = Kafka()
 SETTINGS
@@ -77,7 +80,7 @@ SETTINGS
 -- Create table for queryable predictions
 CREATE TABLE IF NOT EXISTS alpaca_silver_predictions_queryable (
     symbol String,
-    price_timestamp DateTime('UTC'),
+    price_timestamp DateTime,
     predicted_price Float64
 ) ENGINE = MergeTree()
 ORDER BY (symbol, price_timestamp);
@@ -134,9 +137,13 @@ WHERE pair.2 IS NOT NULL;
 
 ------------------ MarketWatch silver -----------------
 
--- drop VIEW if exists feed_consumeer_marketwatch_silver;
--- drop TABLE if exists marketwatch_silver_raw_data;
--- drop TABLE if exists marketwatch_silver_consumable;
+-- DROP VIEW IF EXISTS feed_consumer_marketwatch_silver;
+-- DROP TABLE IF EXISTS marketwatch_silver_raw_data;
+-- DROP TABLE IF EXISTS marketwatch_silver_consumable;
+
+-- DROP VIEW IF EXISTS marketwatch_silver_predictions_view;
+-- DROP TABLE IF EXISTS marketwatch_silver_predictions;
+-- DROP TABLE IF EXISTS marketwatch_silver_predictions_queryable;
 
 CREATE TABLE IF NOT EXISTS marketwatch_silver_raw_data (
     id String,
@@ -173,9 +180,45 @@ SELECT
 FROM marketwatch_silver_raw_data;
 
 
+-- Create target table for predictions
+CREATE TABLE IF NOT EXISTS marketwatch_silver_predictions (
+    id String,
+    predicted_label String,
+    score Float64,
+    message_timestamp DateTime('UTC')
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'marketwatch_sentiment',
+    kafka_group_name = 'marketwatch_sentiment_clickhouse_group',
+    kafka_format = 'CSV',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 1,
+    kafka_num_consumers = 1;
+
+-- Create table for queryable predictions
+CREATE TABLE IF NOT EXISTS marketwatch_silver_predictions_queryable (
+    id String,
+    predicted_label String,
+    score Float64,
+    message_timestamp DateTime('UTC')
+) ENGINE = ReplacingMergeTree()
+ORDER BY message_timestamp;
+
+-- Create materialized view for querability of predictions
+CREATE MATERIALIZED VIEW IF NOT EXISTS marketwatch_silver_predictions_view
+TO marketwatch_silver_predictions_queryable
+AS
+SELECT
+    id,
+    predicted_label,
+    score,
+    message_timestamp
+FROM marketwatch_silver_predictions;
 
 
----------------- Investingcom silver ------------
+
+-- ---------------- Investingcom silver ------------
 
 -- Drop existing views and tables
 
@@ -293,3 +336,44 @@ SELECT
     toFloat64OrNull(Close) AS Close,
     toFloat64OrNull(Volume) AS Volume
 FROM kaggle_gold_silver_raw_data;
+
+
+
+--Create table for storing model metrics
+CREATE TABLE IF NOT EXISTS model_metrics (
+    id String,
+    model_data_name String,
+    metric_name String,
+    metric_value Float64,
+    update_timestamp DateTime('UTC')
+) ENGINE = Kafka()
+SETTINGS
+    kafka_broker_list = 'kafka:9092',
+    kafka_topic_list = 'model_metrics',
+    kafka_group_name = 'models_clickhouse_group',
+    kafka_format = 'CSV',
+    kafka_row_delimiter = '\n',
+    kafka_skip_broken_messages = 1,
+    kafka_num_consumers = 1;
+
+-- Create table for queryable model metrics
+CREATE TABLE IF NOT EXISTS model_metrics_queryable (
+    id String,
+    model_data_name String,
+    metric_name String,
+    metric_value Float64,
+    update_timestamp DateTime('UTC')
+) ENGINE = MergeTree()
+ORDER BY (model_data_name, metric_name, update_timestamp);
+
+-- Create materialized view for querability of model metrics
+CREATE MATERIALIZED VIEW IF NOT EXISTS model_metrics_view
+TO model_metrics_queryable
+AS
+SELECT
+    id,
+    model_data_name,
+    metric_name,
+    metric_value,
+    update_timestamp
+FROM model_metrics;
