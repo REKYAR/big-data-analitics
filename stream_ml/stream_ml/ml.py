@@ -5,6 +5,9 @@ from typing import List
 from transformers import pipeline
 from io import StringIO
 from email.utils import parsedate_to_datetime
+from gold_price_utils import GoldPriceModel
+from investingcom_utils import InvestingModel
+import pandas as pd
 import csv
 import datetime
 import time
@@ -41,7 +44,7 @@ def run_multi_predictor(target_pairs: List[str]):
             logging.error(f"Failed to connect to Kafka: {e}")
             time.sleep(10)
 
-    consumer.subscribe(['alpaca_silver', 'marketwatch_silver'])
+    consumer.subscribe(['alpaca_silver', 'marketwatch_silver', 'kaggle_gold_silver', 'investingcom_silver'])
 
     print("Consumer started")
 
@@ -53,6 +56,8 @@ def run_multi_predictor(target_pairs: List[str]):
 
     predictor = MultiPairPredictor(target_pairs, producer)
     sentiment_pipeline = pipeline(model="distilbert/distilbert-base-uncased-finetuned-sst-2-english")
+    gold_price_predictor = GoldPriceModel()
+    investing_model = InvestingModel(['amazon', 'tesla', 'bitcoin'])
     metrics_id = 1
 
     while True:
@@ -85,6 +90,7 @@ def run_multi_predictor(target_pairs: List[str]):
                     predictor.update_historical_prices(message)
                 predictor.send_metrics(metrics_id)
                 metrics_id += 1
+
             elif topic.topic == 'marketwatch_silver':
                 for message in messages:
                     if has_null_bytes(message.value):
@@ -104,6 +110,61 @@ def run_multi_predictor(target_pairs: List[str]):
                         'marketwatch_sentiment', 
                         value=f"{id},{sentiment[0]['label']},{sentiment[0]['score']},{parsedate_to_datetime(timestamp).strftime('%Y-%m-%dT%H:%M:%S')}".encode('utf-8')
                         )
+
+            elif topic.topic == 'kaggle_gold_silver':
+                for message in messages:
+                    if has_null_bytes(message.value):
+                        continue
+                    message = message.value.decode('utf-8')
+
+                    csv_reader = csv.reader(StringIO(message))
+                    next(csv_reader)  # Skip header
+                    
+                    row = next(csv_reader)
+                    message_data = {
+                        'date': row[0],
+                        'time': row[1],
+                        'open': row[2],
+                        'high': row[3],
+                        'low': row[4],
+                        'close': row[5],
+                        'volume': row[6]
+                    }
+                    prediction = gold_price_predictor.predict_price(message_data)
+                    date_str = f"{message_data['date']} {message_data['time']}"
+                    date_str = datetime.datetime.strptime(date_str, "%Y.%m.%d %H:%M")
+                    output_date = date_str.strftime("%Y-%m-%dT%H:%M:%S")
+                    producer.send(
+                        'kaggle_gold_predictions', 
+                        value=f"{output_date},{prediction}".encode('utf-8')
+                        )
+            elif topic.topic == 'investingcom_silver':
+                for message in messages:
+                    if has_null_bytes(message.value):
+                        continue
+                    message = message.value.decode('utf-8')
+
+                    csv_reader = csv.reader(StringIO(message))
+                    next(csv_reader)  # Skip header
+
+                    row = next(csv_reader)
+                    message_data = {
+                        'date': row[0],
+                        'open': row[2].replace(',', ''),
+                        'high': row[3].replace(',', ''),
+                        'low': row[4].replace(',', ''),
+                        'volume': row[5].replace(',', '').replace('K', '').replace('M', '')
+                    }
+                    entity = row[7].lower().replace('.com', '')
+                    prediction = investing_model.predict_price(message_data, entity)
+                    date_str = f"{message_data['date']}"
+                    date_str = datetime.datetime.strptime(date_str, "%m/%d/%Y")
+                    output_date = date_str.strftime("%Y-%m-%dT%H:%M:%S")
+                    producer.send(
+                        'investingcom_predictions', 
+                        value=f"{output_date},{entity},{prediction}".encode('utf-8')
+                        )
+
 
 def test_consumer():
     consumer = KafkaConsumer(
