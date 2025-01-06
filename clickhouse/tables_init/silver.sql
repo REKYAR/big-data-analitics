@@ -218,7 +218,7 @@ FROM marketwatch_silver_predictions;
 
 
 
--- ---------------- Investingcom silver ------------
+---------------- Investingcom silver ------------
 
 -- Drop existing views and tables
 
