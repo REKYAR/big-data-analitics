@@ -8,6 +8,7 @@ Course project at Warsaw Univeristy of Technology
 ## Setup
 - download stuff to run docker with (most likely wsl2)
 - download docker compose
+- if any changes have been made to code in [the Python related section](stream_ml) (or before the first execution), ```docker-compose -f dockerCompose.yaml build``` has to be run
 - run pipeline by configuring Nifi (below) and then calling ```docker-compose -f dockerCompose.yaml up```, to terminate ```docker-compose -f dockerCompose.yaml down ```
 
 ## Nifi
