@@ -4,7 +4,7 @@ USE BigDataAnalytics;
 
 
 
--- ------------ Alpaca bronze --------------
+------------ Alpaca bronze --------------
 
 -- Clean up existing objects
 
