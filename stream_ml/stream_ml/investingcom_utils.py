@@ -81,8 +81,7 @@ class InvestingModel:
             features['rolling_volume'] = df['volume'].mean()
         
         # Create DataFrame with features in correct order
-        feature_order = ['day_of_week', 'month',
-        'price_range', 
+        feature_order = ['day_of_week', 'month', 'price_range', 
         'volume_lag_1', 'volume_lag_2', 'volume_lag_3',
         'range_lag_1', 'range_lag_2', 'range_lag_3',
         'rolling_mean_price', 'rolling_std_price', 'rolling_volume']

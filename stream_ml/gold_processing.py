@@ -123,13 +123,6 @@ def load_model_and_scaler(model_path='stream_ml/models/gold_price_model.pkl', sc
     
     return model, scaler
 
-# def predict_next_hour(model, current_data):
-#     """
-#     Make a prediction for the next hour's closing price.
-#     """
-#     return model.predict(current_data)[0]
-
-# Usage example:
 def main():
     # Load your data
     df = pd.read_csv('gold_prices.csv')

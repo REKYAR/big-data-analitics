@@ -57,7 +57,8 @@ def run_multi_predictor(target_pairs: List[str]):
     predictor = MultiPairPredictor(target_pairs, producer)
     sentiment_pipeline = pipeline(model="distilbert/distilbert-base-uncased-finetuned-sst-2-english")
     gold_price_predictor = GoldPriceModel()
-    investing_model = InvestingModel(['amazon', 'tesla', 'bitcoin'])
+    entities = ['amazon', 'tesla', 'bitcoin']
+    investing_model = InvestingModel(entities)
     metrics_id = 1
 
     while True:
@@ -156,6 +157,9 @@ def run_multi_predictor(target_pairs: List[str]):
                         'volume': row[5].replace(',', '').replace('K', '').replace('M', '')
                     }
                     entity = row[7].lower().replace('.com', '')
+                    if entity not in entities:
+                        print(f"Entity {entity} not supported")
+                        continue
                     prediction = investing_model.predict_price(message_data, entity)
                     date_str = f"{message_data['date']}"
                     date_str = datetime.datetime.strptime(date_str, "%m/%d/%Y")
