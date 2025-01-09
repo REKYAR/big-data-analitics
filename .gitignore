@@ -2,7 +2,7 @@
 nifi/volumes/BIG_DATA
 
 # grafana auto generated
-grafana/volumes/data
+grafana/volumes/data/plugins
 
 # secrets
 secrets.env
