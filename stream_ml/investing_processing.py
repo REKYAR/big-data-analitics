@@ -13,7 +13,17 @@ def load_and_clean_data(path='Bitcoin Historical Data.csv'):
     # First remove any commas in these columns
     numeric_columns = ['Price', 'Open', 'High', 'Low']
 
-    df['Vol.'] = df['Vol.'].str.replace('K', '').str.replace('M', '').astype(float)
+    def change_KMB_to_numeric(value):
+        if value[-1] == 'K':
+            return float(value[:-1]) * 1e3
+        elif value[-1] == 'M':
+            return float(value[:-1]) * 1e6
+        elif value[-1] == 'B':
+            return float(value[:-1]) * 1e9
+        else:
+            return float(value)
+
+    df['Vol.'] = df['Vol.'].apply(change_KMB_to_numeric)
 
     # Drop the 'Change %' column
     df = df.drop('Change %', axis=1)
@@ -88,12 +98,10 @@ def train_model(X_train, y_train):
     Train an XGBoost model with optimized parameters.
     """
     model = XGBRegressor(
-        n_estimators=10000,
+        n_estimators=1000,
         learning_rate=0.01,
-        max_depth=4,
+        max_depth=6,
         min_child_weight=3,
-        subsample=0.8,
-        colsample_bytree=0.8,
         random_state=1307
     )
     
