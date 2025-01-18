@@ -133,7 +133,7 @@ def run_multi_predictor(target_pairs: List[str]):
                     }
                     prediction = gold_price_predictor.predict_price(message_data)
                     date_str = f"{message_data['date']} {message_data['time']}"
-                    date_str = datetime.datetime.strptime(date_str, "%Y.%m.%d %H:%M")
+                    date_str = datetime.datetime.strptime(date_str, "%Y.%m.%d %H:%M") + datetime.timedelta(hours=1)
                     output_date = date_str.strftime("%Y-%m-%dT%H:%M:%S")
                     producer.send(
                         'kaggle_gold_predictions', 
@@ -162,7 +162,7 @@ def run_multi_predictor(target_pairs: List[str]):
                         continue
                     prediction = investing_model.predict_price(message_data, entity)
                     date_str = f"{message_data['date']}"
-                    date_str = datetime.datetime.strptime(date_str, "%m/%d/%Y")
+                    date_str = datetime.datetime.strptime(date_str, "%m/%d/%Y") + datetime.timedelta(days=1)
                     output_date = date_str.strftime("%Y-%m-%dT%H:%M:%S")
                     producer.send(
                         'investingcom_predictions', 
