@@ -337,13 +337,13 @@ DROP TABLE IF EXISTS kaggle_gold_predictions_queryable;
 
 -- Create raw data table connected to Kafka for Gold Silver
 CREATE TABLE IF NOT EXISTS kaggle_gold_silver_raw_data (
-    Date String,
-    Time String,
-    Open String,
-    High String,
-    Low String,
-    Close String,
-    Volume String
+    date String,
+    time String,
+    open String,
+    high String,
+    low String,
+    close String,
+    volume String
 ) ENGINE = Kafka()
 SETTINGS
     kafka_broker_list = 'kafka:9092',
@@ -369,12 +369,12 @@ ORDER BY DateTime;
 CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_kaggle_gold_silver 
 TO kaggle_gold_silver_consumable AS
 SELECT
-    parseDateTimeBestEffort(concat(Date, ' ', Time)) AS DateTime,
-    toFloat64OrNull(Open) AS Open,
-    toFloat64OrNull(High) AS High,
-    toFloat64OrNull(Low) AS Low,
-    toFloat64OrNull(Close) AS Close,
-    toFloat64OrNull(Volume) AS Volume
+    parseDateTimeBestEffort(concat(date, ' ', time)) AS DateTime,
+    toFloat64OrNull(open) AS Open,
+    toFloat64OrNull(high) AS High,
+    toFloat64OrNull(low) AS Low,
+    toFloat64OrNull(close) AS Close,
+    toFloat64OrNull(volume) AS Volume
 FROM kaggle_gold_silver_raw_data;
 
 -- Create target table for predictions
