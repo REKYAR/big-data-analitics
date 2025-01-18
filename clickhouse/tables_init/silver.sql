@@ -267,7 +267,7 @@ ORDER BY (Date, entity);
 CREATE MATERIALIZED VIEW IF NOT EXISTS feed_consumer_investingcom_silver 
 TO investingcom_silver_consumable AS
 SELECT
-    parseDateTimeBestEffort(Date) AS Date,
+    parseDateTimeBestEffortUS(Date) AS Date,
     toFloat64OrNull(replaceRegexpAll(Price, ',', '')) AS Price,
     toFloat64OrNull(replaceRegexpAll(Open, ',', '')) AS Open,
     toFloat64OrNull(replaceRegexpAll(High, ',', '')) AS High,
