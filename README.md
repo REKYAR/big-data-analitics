@@ -23,6 +23,7 @@ Course project at Warsaw Univeristy of Technology
 
 ## Grafana
 - Visit https://localhost:3000
-- Use credentials from the `dockerCompose.yaml` file to authenticate.
+- Use credentials from the `dockerCompose.yaml` file to authenticate
+- Click 'Dashboards' on the left panel to see the list of available dashboards
 
 Fo troubleshooting cat server log files to cionsole and copy past into normal text editor, bot error and nonerror log files are useful for the purpose.
