@@ -8,15 +8,15 @@ USE BigDataAnalytics;
 
 -- Clean up existing objects
 
-DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
-DROP TABLE IF EXISTS alpaca_silver_raw_data;
-DROP TABLE IF EXISTS alpaca_silver_consumable;
+-- DROP VIEW IF EXISTS feed_consumer_alpaca_silver;
+-- DROP TABLE IF EXISTS alpaca_silver_raw_data;
+-- DROP TABLE IF EXISTS alpaca_silver_consumable;
 
-DROP VIEW IF EXISTS alpaca_silver_predictions_view;
-DROP TABLE IF EXISTS alpaca_silver_predictions;
-DROP TABLE IF EXISTS alpaca_silver_predictions_queryable;
+-- DROP VIEW IF EXISTS alpaca_silver_predictions_view;
+-- DROP TABLE IF EXISTS alpaca_silver_predictions;
+-- DROP TABLE IF EXISTS alpaca_silver_predictions_queryable;
 
-DROP TABLE IF EXISTS model_metrics;
+-- DROP TABLE IF EXISTS model_metrics;
 
 -- Create Kafka source table for silver (CSV) data
 CREATE TABLE IF NOT EXISTS alpaca_silver_raw_data (
@@ -137,13 +137,13 @@ WHERE pair.2 IS NOT NULL;
 
 ------------------ MarketWatch silver -----------------
 
-DROP VIEW IF EXISTS feed_consumer_marketwatch_silver;
-DROP TABLE IF EXISTS marketwatch_silver_raw_data;
-DROP TABLE IF EXISTS marketwatch_silver_consumable;
+-- DROP VIEW IF EXISTS feed_consumer_marketwatch_silver;
+-- DROP TABLE IF EXISTS marketwatch_silver_raw_data;
+-- DROP TABLE IF EXISTS marketwatch_silver_consumable;
 
-DROP VIEW IF EXISTS marketwatch_silver_predictions_view;
-DROP TABLE IF EXISTS marketwatch_silver_predictions;
-DROP TABLE IF EXISTS marketwatch_silver_predictions_queryable;
+-- DROP VIEW IF EXISTS marketwatch_silver_predictions_view;
+-- DROP TABLE IF EXISTS marketwatch_silver_predictions;
+-- DROP TABLE IF EXISTS marketwatch_silver_predictions_queryable;
 
 CREATE TABLE IF NOT EXISTS marketwatch_silver_raw_data (
     id String,
@@ -222,13 +222,13 @@ FROM marketwatch_silver_predictions;
 
 -- Drop existing views and tables
 
-DROP VIEW IF EXISTS feed_consumer_investingcom_silver;
-DROP TABLE IF EXISTS investingcom_silver_raw_data;
-DROP TABLE IF EXISTS investingcom_silver_consumable;
+-- DROP VIEW IF EXISTS feed_consumer_investingcom_silver;
+-- DROP TABLE IF EXISTS investingcom_silver_raw_data;
+-- DROP TABLE IF EXISTS investingcom_silver_consumable;
 
-DROP VIEW IF EXISTS investingcom_silver_predictions_view;
-DROP TABLE IF EXISTS investingcom_silver_predictions;
-DROP TABLE IF EXISTS investingcom_silver_predictions_queryable;
+-- DROP VIEW IF EXISTS investingcom_silver_predictions_view;
+-- DROP TABLE IF EXISTS investingcom_silver_predictions;
+-- DROP TABLE IF EXISTS investingcom_silver_predictions_queryable;
 
 -- Create raw data table connected to Kafka
 CREATE TABLE IF NOT EXISTS investingcom_silver_raw_data (
@@ -327,13 +327,13 @@ FROM investingcom_silver_predictions;
 
 -- Drop existing views and tables
 
-DROP VIEW IF EXISTS feed_consumer_kaggle_gold_silver;
-DROP TABLE IF EXISTS kaggle_gold_silver_raw_data;
-DROP TABLE IF EXISTS kaggle_gold_silver_consumable;
+-- DROP VIEW IF EXISTS feed_consumer_kaggle_gold_silver;
+-- DROP TABLE IF EXISTS kaggle_gold_silver_raw_data;
+-- DROP TABLE IF EXISTS kaggle_gold_silver_consumable;
 
-DROP VIEW IF EXISTS kaggle_gold_predictions_view;
-DROP TABLE IF EXISTS kaggle_gold_predictions;
-DROP TABLE IF EXISTS kaggle_gold_predictions_queryable;
+-- DROP VIEW IF EXISTS kaggle_gold_predictions_view;
+-- DROP TABLE IF EXISTS kaggle_gold_predictions;
+-- DROP TABLE IF EXISTS kaggle_gold_predictions_queryable;
 
 -- Create raw data table connected to Kafka for Gold Silver
 CREATE TABLE IF NOT EXISTS kaggle_gold_silver_raw_data (
