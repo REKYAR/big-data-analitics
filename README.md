@@ -21,4 +21,8 @@ Course project at Warsaw Univeristy of Technology
 - To run queries go to Exec tab in docker compose and execute ``` cickhouse-client ``` command, clichkouse terminal shall appear
 - Execute ```USE BigDataAnalytics; SHOW TABLES;``` to see available tables in our project, note that the tables that directly ingest kafka are locked from reading, refer to their *_consumalbe version
 
+## Grafana
+- Visit https://localhost:3000
+- Use credentials from the `dockerCompose.yaml` file to authenticate.
+
 Fo troubleshooting cat server log files to cionsole and copy past into normal text editor, bot error and nonerror log files are useful for the purpose.
