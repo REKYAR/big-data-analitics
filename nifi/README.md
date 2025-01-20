@@ -13,6 +13,10 @@ The rest of the data is fetched inside NiFi.
 
 ## How to run the flow
 
+To access NiFi, visit `http://localhost:8443/nifi` in a browser. 
+
+**Note:** it is important that `http` is used, and not `https`, otherwise it will not work. The browser may warn of an unsafe connection, but this warning can be dismissed.
+
 Steps 1-3 are needed to be performed only when running the flow for the first time, or if the templates are updated.
 
 1. Import each template to NiFi. On the left-hand side, there is an "Operate" panel, and the button to upload templates is the last button in the first row of buttons;
@@ -55,12 +59,6 @@ it is key for consumers to handle duplicate IDs across separate messages.
 **Bronze topic:** `marketwatch_bronze`
 
 **Silver topic:** `marketwatch_silver`
-
-### FreeCurrencyAPI data
-
-**Bronze topic:** `freecurrencyapi_bronze`
-
-**Silver topic:** `freecurrencyapi_silver`
 
 ### investing.com data
 
