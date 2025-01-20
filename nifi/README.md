@@ -60,12 +60,6 @@ it is key for consumers to handle duplicate IDs across separate messages.
 
 **Silver topic:** `marketwatch_silver`
 
-### FreeCurrencyAPI data
-
-**Bronze topic:** `freecurrencyapi_bronze`
-
-**Silver topic:** `freecurrencyapi_silver`
-
 ### investing.com data
 
 **Bronze topics:**`investingcom_bronze`
